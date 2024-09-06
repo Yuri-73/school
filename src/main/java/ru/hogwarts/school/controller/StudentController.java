@@ -5,10 +5,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.NoStudentAgeException;
 import ru.hogwarts.school.exception.NullAgeException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("student")
@@ -20,7 +22,7 @@ public class StudentController {
     }
 
     @PostMapping // POST http://localhost:8090/student
-    public ResponseEntity createStudent(@RequestBody Student student) { //Для записи студентов по телу через свагер(постман)
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) { //Для записи студентов по телу через свагер(постман)
         Student student1 = studentService.createStudent(student);
         return ResponseEntity.ok(student1); //В свагере увидим созданный объект в JSON
     }
@@ -53,11 +55,12 @@ public class StudentController {
 //    }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/student/1
-    public ResponseEntity deleteStudent(@PathVariable Long id) { //Для удаления студента по id из Мапы через Свагер
-        if (studentService.deleteStudent(id) == null) {
+    public ResponseEntity<Student> deleteStudent(@PathVariable Long id) { //Для удаления студента по id из Мапы через Свагер
+        Student student = studentService.deleteStudent(id);
+        if (student == null) {
             return ResponseEntity.status(405).build(); //Если студента с этим Id нет, то выскочит 405. Вариант 3
         }
-        return ResponseEntity.ok(studentService.deleteStudent(id)); //При удалении студента по выбранному Id по умолчанию пропишется 404.
+        return ResponseEntity.ok(student); //При удалении студента по выбранному Id по умолчанию пропишется 404.
     }
 
     @GetMapping() // GET http://localhost:8090/student

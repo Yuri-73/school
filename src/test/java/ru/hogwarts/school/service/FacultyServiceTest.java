@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 
 import java.util.Collection;
 
@@ -65,7 +66,8 @@ class FacultyServiceTest {
         out.createFaculty(faculty1);
         Collection<Faculty> faculties = out.getAllFaculty();
         assertEquals(faculty1, out.findFaculty(1l));
-        out.deleteFaculty(1l);
+
+        assertEquals(faculty1, out.deleteFaculty(1l));
         assertTrue(faculties.isEmpty());
     }
 
@@ -94,6 +96,14 @@ class FacultyServiceTest {
         assertTrue(out.getAllFaculty().contains(faculty1));
         assertTrue(out.getAllFaculty().contains(faculty2));
         assertTrue(out.getAllFaculty().contains(faculty3));
+
+        org.assertj.core.api.Assertions.assertThat(faculties.size()).isEqualTo(3); //Вариант 2 (через assertj)
+        //check - убеждаемся, что Лист содержит указанные 3 объекта в любом порядке (через assertj):
+        org.assertj.core.api.Assertions.assertThat(faculties)
+                .containsExactlyInAnyOrder(
+                        new Faculty(1L, "АО", "синий"),
+                        new Faculty(2L, "РиРНО", "голубой"),
+                        new Faculty(3L, "АВ", "чёрный"));
     }
 
     @Test

@@ -58,7 +58,6 @@ class StudentServiceTest {
         assertEquals(null, out.editStudent(student2));
     }
 
-
     @Test
     void shouldDeleteStudent_WhenCorrectId_ThenRemoveStudent() {
         Student student1 = new Student(1L, "Виктор", 23);
@@ -86,6 +85,7 @@ class StudentServiceTest {
         Student student1 = new Student(1L, "Виктор", 23);
         Student student2 = new Student(2L, "Юрий", 24);
         Student student3 = new Student(3L, "Олег", 21);
+
         out.createStudent(student1);
         out.createStudent(student2);
         out.createStudent(student3);
@@ -94,6 +94,14 @@ class StudentServiceTest {
         assertTrue(out.getAllStudent().contains(student1));
         assertTrue(out.getAllStudent().contains(student2));
         assertTrue(out.getAllStudent().contains(student3));
+
+        org.assertj.core.api.Assertions.assertThat(students.size()).isEqualTo(3); //Вариант 2 (через assertj)
+        //check - убеждаемся, что Лист содержит указанные 3 объекта в любом порядке (через assertj):
+        org.assertj.core.api.Assertions.assertThat(students)
+                .containsExactlyInAnyOrder(
+                        new Student(1L, "Виктор", 23),
+                        new Student(2L, "Юрий", 24),
+                        new Student(3L, "Олег", 21));
     }
 
     @Test
@@ -124,4 +132,5 @@ class StudentServiceTest {
         out.createStudent(student4);
         Assertions.assertThrows(NoStudentAgeException.class, () -> out.getStudentByAge(22));
     }
+
 }

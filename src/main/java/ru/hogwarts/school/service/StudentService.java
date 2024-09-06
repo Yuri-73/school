@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-    Map<Long, Student> allStudent = new HashMap<>(); //Пустая пополняемая Мапа
+    private final Map<Long, Student> allStudent = new HashMap<>(); //Пустая пополняемая Мапа
     private Long countId = 0L; //Создаем поле идентификатора и инициализируем нулём, чтобы в первом же ключе инкриментируем
 
     public Student createStudent(Student student) { //Вносим в коллекцию-Мапу студентов по одному

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
-    Map<Long, Faculty> allFaculty = new HashMap<>(); //Пустая пополняемая Мапа
+    private final Map<Long, Faculty> allFaculty = new HashMap<>(); //Пустая пополняемая Мапа
     private Long countId = 0L; //Создаем поле идентификатора и инициализируем нулём, чтобы в первом же ключе инкриментировать
 
     public Faculty createFaculty(Faculty faculty) { //Вносим в коллекцию-Мапу факультеты по одному
@@ -36,7 +36,9 @@ public class FacultyService {
 
     public Faculty deleteFaculty(Long id) { //Удаляем из коллекции-Мапы факультет по ID
         if (allFaculty.get(id) != null) {
-            return allFaculty.remove(id);
+            Faculty faculty = allFaculty.remove(id);
+            System.out.println("faculty: " + faculty);
+            return faculty;
         }
         return null;
     }
