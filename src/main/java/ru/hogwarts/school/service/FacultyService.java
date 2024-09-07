@@ -59,7 +59,15 @@ public class FacultyService {
         if (facultyListByColor.isEmpty())
             throw new NoFacultyColorException();
         return facultyListByColor;
-
     }
+
+//    List<Faculty> findAllByColor(String color) {  //Вариант 2 поиска по цвету: по вебинару от Санёчка
+//        List<Faculty> facultyListByAge = allFaculty.values()
+//                .stream()
+//                .filter(e -> e.getColor().equals(color))
+//                .collect(Collectors.toList());
+//
+//        return facultyListByAge;
+//    }
 }
 

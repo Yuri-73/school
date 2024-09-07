@@ -55,5 +55,14 @@ public class StudentService {
             throw new NoStudentAgeException();
         return studentListByAge;
     }
+
+//    List<Student> findAllByAge(int age) {  //Вариант 2 поиска по возрасту: по вебинару от Санёчка
+//        List<Student> studentListByAge = allStudent.values()
+//                .stream()
+//                .filter(e -> e.getAge() == age)
+//                .collect(Collectors.toList());
+//
+//        return studentListByAge;
+//    }
 }
 

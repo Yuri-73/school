@@ -8,6 +8,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -119,6 +120,9 @@ class FacultyServiceTest {
         assertTrue(out.getFacultyByColor("синий").contains("АО"));
         assertTrue(out.getFacultyByColor("синий").contains("СД"));
         assertEquals(out.getFacultyByColor("синий").size(), 2);
+
+        Collection<String> students = out.getFacultyByColor("синий");
+        org.assertj.core.api.Assertions.assertThat(students).containsAll(List.of(faculty1.getName(), faculty4.getName()));
     }
 
     @Test

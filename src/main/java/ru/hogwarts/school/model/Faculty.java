@@ -1,5 +1,7 @@
 package ru.hogwarts.school.model;
 
+import lombok.Data;
+
 import java.util.Objects;
 
 public class Faculty {
