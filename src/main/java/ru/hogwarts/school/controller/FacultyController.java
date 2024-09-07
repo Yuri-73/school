@@ -12,7 +12,9 @@ import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NullEmptyColorException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.service.FacultyService;
+
 import java.util.Collection;
+import java.util.List;
 
 @RestController
 @RequestMapping("faculty")
@@ -73,5 +75,11 @@ public class FacultyController {
             return "Факультеты с таким цветом отсутствуют";
         }
     }
+
+//    @GetMapping(path = "/get/by-color")
+//        //localhost:8090/faculty/get/by-color?color=22
+//    List<Faculty> findAllByColor(@RequestParam("color") String color) { //Вариант 2 по поиску Листа факультетов с одним и тем же цветом: по вебинару 3.2
+//        return facultyService.findAllByColor(color);
+//    }
 }
 

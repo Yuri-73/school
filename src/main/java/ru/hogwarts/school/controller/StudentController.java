@@ -10,6 +10,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -79,5 +80,11 @@ public class StudentController {
             return "Студентов с таким возрастом в коллекции нет";
         }
     }
+
+//    @GetMapping(path = "/get/by-age")
+//        //localhost:8090/student/get/by-age?age=22
+//    List<Student> findAllByAge(@RequestParam("age") int age) { //Вариант 2 по поиску Листа с одним и тем же возрастом: по вебинару 3.2
+//        return studentService.findAllByAge(age);
+//    }
 }
 

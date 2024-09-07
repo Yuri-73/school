@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import ru.hogwarts.school.exception.NoStudentAgeException;
 import ru.hogwarts.school.model.Student;
 
+import java.awt.*;
 import java.util.Collection;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -66,6 +68,8 @@ class StudentServiceTest {
         assertEquals(student1, out.findStudent(1l));
         out.deleteStudent(1l);
         assertTrue(students.isEmpty());
+        Student student2 = out.findStudent(1l);
+        assertNull(student2);
     }
 
     @Test
@@ -102,6 +106,7 @@ class StudentServiceTest {
                         new Student(1L, "Виктор", 23),
                         new Student(2L, "Юрий", 24),
                         new Student(3L, "Олег", 21));
+
     }
 
     @Test
@@ -114,10 +119,14 @@ class StudentServiceTest {
         out.createStudent(student2);
         out.createStudent(student3);
         out.createStudent(student4);
+
         assertTrue(out.getStudentByAge(21).contains("Виктор"));
         assertTrue(out.getStudentByAge(21).contains("Олег"));
         assertTrue(out.getStudentByAge(21).contains("Пётр"));
         assertEquals(out.getStudentByAge(21).size(), 3);
+
+        Collection<String> students = out.getStudentByAge(21);
+        org.assertj.core.api.Assertions.assertThat(students).containsAll(List.of(student1.getName(), student3.getName(), student4.getName()));
     }
 
     @Test
