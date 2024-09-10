@@ -2,50 +2,55 @@ package ru.hogwarts.school.service;
 
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NoStudentAgeException;
+import ru.hogwarts.school.exception.NullAgeException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
-    private final Map<Long, Student> allStudent = new HashMap<>(); //Пустая пополняемая Мапа
-    private Long countId = 0L; //Создаем поле идентификатора и инициализируем нулём, чтобы в первом же ключе инкриментируем
+    private final StudentRepository studentRepository;
 
-    public Student createStudent(Student student) { //Вносим в коллекцию-Мапу студентов по одному
-        student.setId(++countId);
-        allStudent.put(countId, student);
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
+
+    public Student createStudent(Student student) {
+        studentRepository.save(student);
         return student;
     }
 
-    public Student findStudent(Long id) { //Находим в коллекции студента по ID
-        if (allStudent.containsKey(id)) {
-            return allStudent.get(id);
+    public Student findStudent(Long id) {
+        Student student = studentRepository.findById(id).orElse(null);
+        return student;
+    }
+
+    public Student editStudent(Student student) {
+        return studentRepository.findById(student.getId())
+                .map(e -> studentRepository.save(student))
+                .orElse(null);
+    }
+
+    public Student deleteStudent(Long id) {
+        var entity = studentRepository.findById(id).orElse(null);
+        if (entity != null) {
+            studentRepository.delete(entity);
         }
-        return null;
+        return entity;
     }
 
-    public Student editStudent(Student student) { //Редактируем объект в коллекции по ID
-        if (allStudent.containsKey(student.getId())) {
-            allStudent.put(student.getId(), student);
-            return student;
+    public Collection<Student> getAllStudent() {
+        return studentRepository.findAll();
+    }
+
+    public Collection<String> getStudentByAge(Integer age) {
+        if (age <= 0) {
+            throw new NullAgeException();
         }
-        return null;
-    }
-
-    public Student deleteStudent(Long id) { //Удаляем из коллекции студента по ID
-        if (allStudent.get(id) != null) {
-            return allStudent.remove(id);
-        }
-        return null;
-    }
-
-    public Collection<Student> getAllStudent() { //Выводим из коллекции-Мапы всех студентов
-        return allStudent.values(); //Превращение Мапы в Лист
-    }
-
-    public Collection<String> getStudentByAge(Integer age) { //Ищем в коллекции-Мапе студентов по возрасту на входе
-
         Collection<String> studentListByAge = getAllStudent()
                 .stream()
                 .filter(e -> e.getAge() == age)
@@ -55,14 +60,5 @@ public class StudentService {
             throw new NoStudentAgeException();
         return studentListByAge;
     }
-
-//    List<Student> findAllByAge(int age) {  //Вариант 2 поиска по возрасту: по вебинару от Санёчка
-//        List<Student> studentListByAge = allStudent.values()
-//                .stream()
-//                .filter(e -> e.getAge() == age)
-//                .collect(Collectors.toList());
-//
-//        return studentListByAge;
-//    }
 }
 

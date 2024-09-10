@@ -1,54 +1,53 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NullEmptyColorException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class FacultyService {
-    private final Map<Long, Faculty> allFaculty = new HashMap<>(); //Пустая пополняемая Мапа
-    private Long countId = 0L; //Создаем поле идентификатора и инициализируем нулём, чтобы в первом же ключе инкриментировать
 
-    public Faculty createFaculty(Faculty faculty) { //Вносим в коллекцию-Мапу факультеты по одному
-        faculty.setId(++countId);
-        allFaculty.put(countId, faculty);
+    private final FacultyRepository facultyRepository;
+
+    public FacultyService(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
+    }
+
+    public Faculty createFaculty(Faculty faculty) {
+        facultyRepository.save(faculty);
         return faculty;
     }
 
-    public Faculty findFaculty(Long id) { //Находим в коллекции факультет по ID
-        if (allFaculty.containsKey(id)) {
-            return allFaculty.get(id);
-        }
-        return null;
+    public Faculty findFaculty(Long id) {
+       Faculty faculty = facultyRepository.findById(id).orElse(null);
+       return faculty;
     }
 
-    public Faculty editFaculty(Faculty faculty) { //Редактируем объект в коллекции-Мапе по ID
-        if (allFaculty.containsKey(faculty.getId())) {
-            allFaculty.put(faculty.getId(), faculty);
-            return faculty;
-        }
-        return null;
+    public Faculty editFaculty(Faculty faculty) {
+        return facultyRepository.findById(faculty.getId())
+                .map(e -> facultyRepository.save(faculty))
+                .orElse(null);
     }
 
-    public Faculty deleteFaculty(Long id) { //Удаляем из коллекции-Мапы факультет по ID
-        if (allFaculty.get(id) != null) {
-            Faculty faculty = allFaculty.remove(id);
-            System.out.println("faculty: " + faculty);
-            return faculty;
+    public Faculty deleteFaculty(Long id) {
+        var entity = facultyRepository.findById(id).orElse(null);
+        if (entity != null) {
+            facultyRepository.delete(entity);
         }
-        return null;
+        return entity;
     }
 
-    public Collection<Faculty> getAllFaculty() { //Выводим из коллекции-Мапы всех факультетов
-        return allFaculty.values(); //Превращение Мапы в Лист
+    public Collection<Faculty> getAllFaculty() {
+        return facultyRepository.findAll();
     }
 
     public Collection<String> getFacultyByColor(String color) { //Ищем в коллекции-Мапе факультет по цвету на входе
-
         if (color == null || color.isEmpty())
             throw new NullEmptyColorException();
         Collection<String> facultyListByColor = getAllFaculty()
@@ -60,14 +59,5 @@ public class FacultyService {
             throw new NoFacultyColorException();
         return facultyListByColor;
     }
-
-//    List<Faculty> findAllByColor(String color) {  //Вариант 2 поиска по цвету: по вебинару от Санёчка
-//        List<Faculty> facultyListByAge = allFaculty.values()
-//                .stream()
-//                .filter(e -> e.getColor().equals(color))
-//                .collect(Collectors.toList());
-//
-//        return facultyListByAge;
-//    }
 }
 
