@@ -20,8 +20,7 @@ public class FacultyService {
     }
 
     public Faculty createFaculty(Faculty faculty) {
-        facultyRepository.save(faculty);
-        return faculty;
+        return facultyRepository.save(faculty);
     }
 
     public Faculty findFaculty(Long id) {
