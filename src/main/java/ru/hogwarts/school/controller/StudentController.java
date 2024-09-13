@@ -59,9 +59,9 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudent());
     }
 
-    @GetMapping(path = "/searchAge")
+    @GetMapping(path = "/get/by-age")  //ДЗ-3.2
         //localhost:8090/student/searchAge?age=22
-    String getStudentByAge(@RequestParam(required = false) Integer age) { //Для вывода студентов из Мапы, чей возраст совпадает с параметром входа через свагер(постман)
+    String getStudentByAge(@RequestParam(required = false) Integer age) {
         try {
             return "Студенты с таким возрастом: " + studentService.getStudentByAge(age);
         } catch (NullAgeException exc) {
@@ -71,10 +71,19 @@ public class StudentController {
         }
     }
 
-//    @GetMapping(path = "/get/by-age")
-//        //localhost:8090/student/get/by-age?age=22
-//    List<Student> findAllByAge(@RequestParam("age") int age) { //Вариант 2 по поиску Листа с одним и тем же возрастом: по вебинару 3.2
-//        return studentService.findAllByAge(age);
-//    }
+    // ДЗ-3.4, шаг 1.1
+    @GetMapping("/age") // GET http://localhost:8090/student/age?min=22&max=23
+    public ResponseEntity<List<Student>> findByAgeStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
+        if (studentService.findByAgeBetween(min, max).isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1;
+        }
+        return ResponseEntity.ok(studentService.findByAgeBetween(min, max)); //Вызов стандартногот метода поиска студентов по отрезку возраста
+    }
+
+    //ДЗ-3.4, шаг 4.2
+    @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?faculty_id=АО
+    public ResponseEntity<Collection<Student>> findStudentsByFaculty_name(String faculty_name) {
+        return ResponseEntity.ok(studentService.findStudentsByFaculty_name(faculty_name));
+    }
 }
 

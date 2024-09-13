@@ -8,6 +8,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.Assert;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NullEmptyColorException;
 import ru.hogwarts.school.model.Faculty;
@@ -166,5 +171,48 @@ class FacultyServiceTest {
         Assertions.assertThrows(NullEmptyColorException.class, () -> out.getFacultyByColor(""));
 
         Assertions.assertThrows(NullEmptyColorException.class, () -> out.getFacultyByColor(null));
+    }
+
+    //ДЗ-3.4:
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2 (доп-но к заданию) (можно было все тест-методы этого ДЗ не делать, потому что они, по-сути, проверяют транзит и сами себя)
+    void shouldFindByNameAndColor_WhenCorrectColorName_ThenFaculties() {
+        //test:
+        Faculty faculty1 = new Faculty(1L, "АО", "синий");
+        Mockito.when(facultyRepositoryMock.findByNameAndColor(any(), any())).thenReturn(faculty1);
+        //check:
+        assertEquals(out.findByNameAndColor(any(), any()), faculty1);
+    }
+
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2
+    void shouldFindByColorIgnoreCase_WhenNullColor_ThenFaculties() {
+        //test:
+        Faculty faculty1 = new Faculty(1L, "АО", "синий");
+        Faculty faculty2 = new Faculty(2L, "РиРНО", "синий");
+        Faculty faculty3 = new Faculty(3L, "АВ", "синий");
+        Faculty faculty4 = new Faculty(4L, "СД", "синий");
+        Collection<Faculty> faculties = List.of(faculty1, faculty2, faculty3, faculty4);
+        Mockito.when(facultyRepositoryMock.findByColorIgnoreCase(any())).thenReturn((List<Faculty>) faculties);
+        //check:
+        assertEquals(out.findByColorIgnoreCase(any()), faculties);
+    }
+
+    @Test //ДЗ-3.4 шаг 4.1
+    void shouldFindFacultyByStudentsIs_WhenCorrectStudent_ThenFaculty() {
+        //test:
+        Student student = new Student(1l, "Bob", 33);
+        Faculty faculty = new Faculty(1L, "АО", "синий");
+        Mockito.when(facultyRepositoryMock.findFacultyByStudentsIs(any())).thenReturn(faculty);
+        //check:
+        assertEquals(out.findFacultyByStudentsIs(student), faculty);
+    }
+
+    @Test  //ДЗ-3.4 шаг 4.1
+    void shouldFindFacultyByStudentsIs_WhenNotCorrectIdStudent_ThenNull() {
+        //test:
+        Student student = new Student(1l, "Bob", 33);
+        Faculty faculty = new Faculty(1L, "АО", "синий");
+        Mockito.when(facultyRepositoryMock.findFacultyByStudentsIs(any())).thenReturn(null);
+        //check:
+        assertEquals(out.findFacultyByStudentsIs(student), null);
     }
 }

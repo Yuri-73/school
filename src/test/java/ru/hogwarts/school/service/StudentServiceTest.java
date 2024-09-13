@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NoStudentAgeException;
 import ru.hogwarts.school.exception.NullAgeException;
@@ -23,6 +24,7 @@ import java.util.Optional;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -162,11 +164,37 @@ class StudentServiceTest {
         Assertions.assertThrows(NoStudentAgeException.class, () -> out.getStudentByAge(24));
     }
 
-    @Test
+    @Test  //ДЗ-3.3
     void shouldGetStudentByAge_WhenNotCorrectAge_ThenNullAgeException() {
         //test and check:
         Assertions.assertThrows(NullAgeException.class, () -> out.getStudentByAge(-1));
 
         Assertions.assertThrows(NullAgeException.class, () -> out.getStudentByAge(0));
+    }
+
+    @Test  //ДЗ-3.4 п.4.2
+    void shouldFindStudentsByFaculty_name_CorrectFaculty_ThenStudents() {
+        //test:
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(2L, "Аркадий", 29);
+        Student student3 = new Student(3L, "Пётр", 24);
+        Student student4 = new Student(4L, "Виктор", 26);
+        Collection<Student> students = List.of(student1, student2, student3, student4);
+        Mockito.when(studentRepositoryMock.findStudentsByFaculty_name(any())).thenReturn((List<Student>) students);
+        //check:
+        assertEquals(out.findStudentsByFaculty_name(any()), students);
+    }
+
+    @Test //ДЗ-3.4 п.1.2
+    void shouldFindByAgeBetween_CorrectParams_ThenStudents() {
+        //test:
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(2L, "Аркадий", 29);
+        Student student3 = new Student(3L, "Пётр", 24);
+        Student student4 = new Student(4L, "Виктор", 26);
+        List<Student> students = List.of(student1, student2, student3, student4);
+        Mockito.when(studentRepositoryMock.findByAgeBetween(anyInt(), anyInt())).thenReturn(students);
+        //check:
+        assertEquals(out.findByAgeBetween(2, 5), students);
     }
 }

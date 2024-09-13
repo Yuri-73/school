@@ -1,10 +1,8 @@
 package ru.hogwarts.school.model;
 
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Entity;
+import javax.persistence.*;
 
+import java.util.Collection;
 import java.util.Objects;
 
 @Entity
@@ -14,6 +12,9 @@ public class Faculty {
     private Long id;
     private String name;
     private String color;
+
+    @OneToMany(mappedBy = "faculty")  //создаётся в таблице студента колонка faculty_id
+    private Collection<Student> students;
 
     public Faculty(Long id, String name, String color) {
         this.id = id;

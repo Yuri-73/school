@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NullEmptyColorException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -64,9 +65,10 @@ public class FacultyController {
         return ResponseEntity.ok(facultyService.getAllFaculty());
     }
 
-    @GetMapping(path = "/searchColor")
-        //localhost:8090/faculty/searchColor?color=green
-    String getFacultyByColor(@RequestParam(required = false) String color) { //Для вывода факультета из Мапы, чей цвет совпадает с параметром входа через Свагер
+    // ДЗ-3.2 Сваггер (без репозитория)
+    @GetMapping(path = "/get/color")
+    //localhost:8090/faculty/searchColor?color=green
+    String getFacultyByColor(@RequestParam(required = false) String color) {
         try {
             return "Факультеты с таким цветом найдены: " + facultyService.getFacultyByColor(color);
         } catch (NullEmptyColorException exc) {
@@ -76,10 +78,27 @@ public class FacultyController {
         }
     }
 
-//    @GetMapping(path = "/get/by-color")
-//        //localhost:8090/faculty/get/by-color?color=22
-//    List<Faculty> findAllByColor(@RequestParam("color") String color) { //Вариант 2 по поиску Листа факультетов с одним и тем же цветом: по вебинару 3.2
-//        return facultyService.findAllByColor(color);
-//    }
+    //ДЗ-3.4 Введение в SQL шаг 3.2 (вариант 2 нахождения фака по его цвету, но через стандартный метод репозитория)
+    @GetMapping("/by-color")
+    public ResponseEntity<Collection<Faculty>> findByColorIgnoreCase(@RequestParam String color) {
+        return ResponseEntity.ok(facultyService.findByColorIgnoreCase(color));
+    }
+
+    // ДЗ-3.4 шаг 1.2 SQL
+    @GetMapping("/by-NameAndColor") //Дополнительный метод, который не совсем по условию (не нашёл в репозитории стандартный метод получения факультета только по его имени)
+    public ResponseEntity<Faculty> findByNameAndColor(@RequestParam String name,
+                                                  @RequestParam String color) {
+        return ResponseEntity.ok(facultyService.findByNameAndColor(name, color));
+    }
+
+    //ДЗ-3.4 шаг 4.1 (SQL) Получение факультета для студента
+    @PostMapping("/by-student")
+    public ResponseEntity<Faculty> findFacultyByStudentsIs(@RequestBody Student student) {
+        Faculty faculty = facultyService.findFacultyByStudentsIs(student);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();  //Выводим 404
+        }
+        return ResponseEntity.ok(faculty);
+    }
 }
 

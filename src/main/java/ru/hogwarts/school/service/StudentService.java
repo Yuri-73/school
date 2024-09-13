@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.exception.NoStudentAgeException;
 import ru.hogwarts.school.exception.NullAgeException;
 import ru.hogwarts.school.model.Faculty;
@@ -46,6 +48,7 @@ public class StudentService {
         return studentRepository.findAll();
     }
 
+    //ДЗ-3.3:
     public Collection<String> getStudentByAge(Integer age) {
         if (age <= 0) {
             throw new NullAgeException();
@@ -58,6 +61,16 @@ public class StudentService {
         if (studentListByAge.isEmpty())
             throw new NoStudentAgeException();
         return studentListByAge;
+    }
+
+    //ДЗ-3.4 шаг 1.1:
+    public List<Student> findByAgeBetween(Integer min, Integer max) {
+        return studentRepository.findByAgeBetween(min, max);
+    }
+
+    //ДЗ-3.4 шаг 4.2:
+    public Collection<Student> findStudentsByFaculty_name(String faculty_name) {
+        return studentRepository.findStudentsByFaculty_name(faculty_name);
     }
 }
 
