@@ -44,16 +44,6 @@ public class StudentController {
         }
         return ResponseEntity.ok(studentService.editStudent(student)); //В свагере увидим отредактированный объект в JSON
     }
-//Другой вариант PUT-запроса для демонстрации реакции приложения на ошибку 404. Пришлось возвращать строку:
-//    @PutMapping // PUT http://localhost:8090/student
-//    public ResponseEntity<String> editStudent(@RequestBody Student student) { //Для редактирования студентов в Мапе через свагер(постман).
-//        // Если такого студента в Мапе нет, то выйдет 404
-//        if (studentService.editStudent(student) == null) {
-//            return ResponseEntity.badRequest().body("В списках студентов не значится"); //Если студента с этим Id не найдено, то выскочит строка "В списках студентов не значится". Вариант 2б
-//        }
-//        studentService.editStudent(student);
-//        return ResponseEntity.ok().body("Студент по указанному id успешно отредактирован"); //В свагере увидим отредактированный объект в JSON
-//    }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/student/1
     public ResponseEntity<Student> deleteStudent(@PathVariable Long id) { //Для удаления студента по id из Мапы через Свагер

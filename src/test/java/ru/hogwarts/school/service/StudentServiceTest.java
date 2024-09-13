@@ -1,145 +1,172 @@
 package ru.hogwarts.school.service;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NoStudentAgeException;
+import ru.hogwarts.school.exception.NullAgeException;
+import ru.hogwarts.school.exception.NullEmptyColorException;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 
-import java.awt.*;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 
+@ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
-    StudentService out = new StudentService();
+
+    @Mock
+    private StudentRepository studentRepositoryMock;
+
+    private StudentService out;
+
+    @BeforeEach
+    public void setUp() {
+        out = new StudentService(studentRepositoryMock);
+    }
 
     @Test
     void shouldCreateStudent_WhenStudent_ThenCorrectResult() {
-        Student student1 = new Student(1L, "Виктор", 23);
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Mockito.when(studentRepositoryMock.save(student1)).thenReturn(student1);
+        //check
+        assertEquals(out.createStudent(student1), student1);
 
-        assertEquals(student1, out.createStudent(student1));
-        Collection<Student> students = out.getAllStudent();
-        assertTrue(out.getAllStudent().contains(student1));
     }
 
     @Test
     void shouldFindStudent_WhenCorrectId_ThenCorrectResult() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        assertEquals(student1, out.findStudent(1l));
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Mockito.when(studentRepositoryMock.findById(student1.getId())).thenReturn(Optional.of((student1)));
+        //check
+        assertEquals(out.findStudent(student1.getId()), student1);
     }
 
     @Test
     void shouldFindStudent_WhenNotCorrectId_ThenNull() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        assertEquals(null, out.findStudent(2l));
+        //test
+        Mockito.when(studentRepositoryMock.findById(any())).thenReturn(Optional.ofNullable(null));
+        //check
+        assertEquals(out.findStudent(2l), null);
     }
 
     @Test
     void shouldEditStudent_WhenCorrectStudent_ThenCorrectResult() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        Collection<Student> students = out.getAllStudent();
-        assertEquals(student1, out.findStudent(1l));
-        Student student2 = new Student(1L, "Олег", 25);
-        assertEquals(student2, out.editStudent(student2));
-        assertTrue(out.getAllStudent().contains(student2));
-        assertFalse(out.getAllStudent().contains(student1));
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(1L, "Аркадий", 29);
+        Mockito.when(studentRepositoryMock.findById(student1.getId())).thenReturn(Optional.of((student1)));
+        Mockito.when(studentRepositoryMock.save(student2)).thenReturn(student2);
+        //check
+        assertEquals(out.editStudent(student2), student2);
     }
 
     @Test
     void shouldEditStudent_WhenNotCorrectStudent_ThenNull() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        Collection<Student> students = out.getAllStudent();
-        assertEquals(student1, out.findStudent(1l));
-        Student student2 = new Student(0L, "Олег", 25);
-        assertEquals(null, out.editStudent(student2));
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(1L, "Аркадий", 29);
+        Mockito.when(studentRepositoryMock.findById(student1.getId())).thenReturn(Optional.ofNullable(null));
+        //check
+        assertEquals(out.editStudent(student2), null);
     }
 
     @Test
     void shouldDeleteStudent_WhenCorrectId_ThenRemoveStudent() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        Collection<Student> students = out.getAllStudent();
-        assertEquals(student1, out.findStudent(1l));
-        out.deleteStudent(1l);
-        assertTrue(students.isEmpty());
-        Student student2 = out.findStudent(1l);
-        assertNull(student2);
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Mockito.when(studentRepositoryMock.findById(student1.getId())).thenReturn(Optional.of((student1)));
+        //check
+        assertEquals(out.deleteStudent(1l), student1);
     }
 
     @Test
     void shouldDeleteStudent_WhenNotCorrectId_ThenNull() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        out.createStudent(student1);
-        Collection<Student> students = out.getAllStudent();
-        assertEquals(student1, out.findStudent(1l));
-        out.deleteStudent(0l);
-        assertTrue(!students.isEmpty());
-        assertTrue(out.getAllStudent().contains(student1));
+        //test
+        Student student1 = new Student(1L, "Юрий", 24);
+        Mockito.when(studentRepositoryMock.findById(student1.getId())).thenReturn(Optional.ofNullable(null));
+        //check
+        assertEquals(out.deleteStudent(student1.getId()), null);
     }
 
     @Test
-    @DisplayName("Возвращает коллекцию из студентов")
+    @DisplayName("Возвращает список из студентов")
     void shouldGetAllStudent() {
-        Student student1 = new Student(1L, "Виктор", 23);
-        Student student2 = new Student(2L, "Юрий", 24);
-        Student student3 = new Student(3L, "Олег", 21);
-
-        out.createStudent(student1);
-        out.createStudent(student2);
-        out.createStudent(student3);
-        Collection<Student> students = out.getAllStudent();
-        assertEquals(students.size(), 3);
+        //test:
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(2L, "Аркадий", 29);
+        Student student3 = new Student(3L, "Пётр", 24);
+        Collection<Student> students = List.of(student1, student2, student3);
+        Mockito.when(studentRepositoryMock.findAll()).thenReturn((List<Student>) students);
+        //check:
+        assertEquals(students.size(), 3);  //Вариант 1 (через jupiter.api)
         assertTrue(out.getAllStudent().contains(student1));
         assertTrue(out.getAllStudent().contains(student2));
         assertTrue(out.getAllStudent().contains(student3));
 
-        org.assertj.core.api.Assertions.assertThat(students.size()).isEqualTo(3); //Вариант 2 (через assertj)
-        //check - убеждаемся, что Лист содержит указанные 3 объекта в любом порядке (через assertj):
+        org.assertj.core.api.Assertions.assertThat(students.size()).isEqualTo(3); //Вариант 2 (через assertj), компоненты можно вразброс
         org.assertj.core.api.Assertions.assertThat(students)
                 .containsExactlyInAnyOrder(
-                        new Student(1L, "Виктор", 23),
-                        new Student(2L, "Юрий", 24),
-                        new Student(3L, "Олег", 21));
-
+                        new Student(1L, "Юрий", 24),
+                        new Student(2L, "Аркадий", 29),
+                        new Student(3L, "Пётр", 24));
     }
 
     @Test
-    void shouldGetStudentByAge_WhenCorrectAge_ThenResultStudentAge() {
-        Student student1 = new Student(1L, "Виктор", 21);
-        Student student2 = new Student(2L, "Юрий", 24);
-        Student student3 = new Student(3L, "Олег", 21);
-        Student student4 = new Student(4L, "Пётр", 21);
-        out.createStudent(student1);
-        out.createStudent(student2);
-        out.createStudent(student3);
-        out.createStudent(student4);
+    void shouldGetStudentByColor_WhenCorrectAge_ThenResultStudentColor() {
+        //test:
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(2L, "Аркадий", 29);
+        Student student3 = new Student(3L, "Пётр", 24);
+        Student student4 = new Student(4L, "Виктор", 26);
+        Collection<Student> students = List.of(student1, student2, student3, student4);
+        Mockito.when(studentRepositoryMock.findAll()).thenReturn((List<Student>) students);
+        //check:
+        assertTrue(out.getStudentByAge(24).contains("Юрий")); //Вариант 1 (через jupiter.api)
+        assertTrue(out.getStudentByAge(24).contains("Пётр"));
+        assertEquals(out.getStudentByAge(24).size(), 2);
 
-        assertTrue(out.getStudentByAge(21).contains("Виктор"));
-        assertTrue(out.getStudentByAge(21).contains("Олег"));
-        assertTrue(out.getStudentByAge(21).contains("Пётр"));
-        assertEquals(out.getStudentByAge(21).size(), 3);
-
-        Collection<String> students = out.getStudentByAge(21);
-        org.assertj.core.api.Assertions.assertThat(students).containsAll(List.of(student1.getName(), student3.getName(), student4.getName()));
+        Collection<String> students2 = out.getStudentByAge(29); //Вариант 2 (через assertj), компоненты можно вразброс
+        org.assertj.core.api.Assertions.assertThat(students2).containsAll(List.of(student2.getName()));
     }
 
     @Test
-    void shouldGetStudentByAge_WhenNotCorrectAge_ThenResultEmptyCollection() {
-        Student student1 = new Student(1L, "Виктор", 21);
-        Student student2 = new Student(2L, "Юрий", 24);
-        Student student3 = new Student(3L, "Олег", 21);
-        Student student4 = new Student(4L, "Пётр", 21);
-        out.createStudent(student1);
-        out.createStudent(student2);
-        out.createStudent(student3);
-        out.createStudent(student4);
-        Assertions.assertThrows(NoStudentAgeException.class, () -> out.getStudentByAge(22));
+    void shouldGetStudentByAge_WhenEmptyList_ThenNoStudentAgeException() {
+        //test:
+        Student student1 = new Student(1L, "Юрий", 24);
+        Student student2 = new Student(2L, "Аркадий", 29);
+        Student student3 = new Student(3L, "Пётр", 24);
+        Student student4 = new Student(4L, "Виктор", 26);
+        Collection<Student> students = List.of(student1, student2, student3, student4);
+        Mockito.when(studentRepositoryMock.findAll()).thenReturn((List<Student>) students);
+        //check:
+        Assertions.assertThrows(NoStudentAgeException.class, () -> out.getStudentByAge(34));
+        //test:
+        List<Student> students2 = emptyList();
+        Mockito.when(studentRepositoryMock.findAll()).thenReturn(students2);
+        //check:
+        Assertions.assertThrows(NoStudentAgeException.class, () -> out.getStudentByAge(24));
     }
 
+    @Test
+    void shouldGetStudentByAge_WhenNotCorrectAge_ThenNullAgeException() {
+        //test and check:
+        Assertions.assertThrows(NullAgeException.class, () -> out.getStudentByAge(-1));
+
+        Assertions.assertThrows(NullAgeException.class, () -> out.getStudentByAge(0));
+    }
 }
