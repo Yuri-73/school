@@ -63,7 +63,7 @@ public class FacultyService {
     }
 
     //ДЗ-3.4 шаг 1.2:
-    public Collection<Faculty> findByColorIgnoreCase(String color) {
+    public Faculty findByColorIgnoreCase(String color) {
         return facultyRepository.findByColorIgnoreCase(color);
     }
 
@@ -72,9 +72,14 @@ public class FacultyService {
         return facultyRepository.findByNameAndColor(name, color);
     }
 
-    //ДЗ-3.4 шаг 4.2:
-    public Faculty findFacultyByStudentsIs(Student student) {
-        return facultyRepository.findFacultyByStudentsIs(student);
+    public Faculty findByName(String name) {
+        return facultyRepository.findByName(name);
+    }
+
+    public Collection<Student> getStudentsOfFaculty(Long id) {
+        return facultyRepository.findById(id)
+                .map(Faculty::getStudents)
+                .orElse(Collections.emptyList());
     }
 }
 

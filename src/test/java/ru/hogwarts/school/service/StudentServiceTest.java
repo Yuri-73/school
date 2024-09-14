@@ -23,8 +23,7 @@ import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
 class StudentServiceTest {
@@ -172,20 +171,20 @@ class StudentServiceTest {
         Assertions.assertThrows(NullAgeException.class, () -> out.getStudentByAge(0));
     }
 
-    @Test  //ДЗ-3.4 п.4.2
-    void shouldFindStudentsByFaculty_name_CorrectFaculty_ThenStudents() {
+    @Test  //ДЗ-3.4 шаг 4.2 (доп. к условию)
+    void shouldFindStudentsByFacultyName_CorrectFaculty_ThenStudents() {
         //test:
         Student student1 = new Student(1L, "Юрий", 24);
         Student student2 = new Student(2L, "Аркадий", 29);
         Student student3 = new Student(3L, "Пётр", 24);
         Student student4 = new Student(4L, "Виктор", 26);
         Collection<Student> students = List.of(student1, student2, student3, student4);
-        Mockito.when(studentRepositoryMock.findStudentsByFaculty_name(any())).thenReturn((List<Student>) students);
+        Mockito.when(studentRepositoryMock.findStudentsByFacultyName(any())).thenReturn((List<Student>) students);
         //check:
-        assertEquals(out.findStudentsByFaculty_name(any()), students);
+        assertEquals(out.findStudentsByFacultyName(any()), students);
     }
 
-    @Test //ДЗ-3.4 п.1.2
+    @Test //ДЗ-3.4 шаг 1.2
     void shouldFindByAgeBetween_CorrectParams_ThenStudents() {
         //test:
         Student student1 = new Student(1L, "Юрий", 24);
@@ -196,5 +195,25 @@ class StudentServiceTest {
         Mockito.when(studentRepositoryMock.findByAgeBetween(anyInt(), anyInt())).thenReturn(students);
         //check:
         assertEquals(out.findByAgeBetween(2, 5), students);
+    }
+
+    @Test //ДЗ-3.4 шаг 4.1
+    void shouldGetFacultyOfStudent_WhenCorrectStudent_ThenFaculty() {
+        //test:
+        Student student = new Student(1l, "Bob", 33);
+        Faculty faculty = new Faculty(1L, "АО", "синий");
+        student.setFaculty(faculty);
+        Mockito.when(studentRepositoryMock.findById(anyLong())).thenReturn(Optional.of((student)));
+        //check:
+        assertEquals(out.getFacultyOfStudent(anyLong()), faculty);
+    }
+
+    @Test  //ДЗ-3.4 шаг 4.1
+    void shouldGetFacultyOfStudent_WhenNotCorrectIdStudent_ThenNull() {
+        //test:
+        Student student = new Student(1l, "Bob", 33);
+        Mockito.when(studentRepositoryMock.findById(anyLong())).thenReturn(Optional.of((student)));
+        //check:
+        assertEquals(out.getFacultyOfStudent(anyLong()), null);
     }
 }

@@ -68,9 +68,16 @@ public class StudentService {
         return studentRepository.findByAgeBetween(min, max);
     }
 
-    //ДЗ-3.4 шаг 4.2:
-    public Collection<Student> findStudentsByFaculty_name(String faculty_name) {
-        return studentRepository.findStudentsByFaculty_name(faculty_name);
+    //ДЗ-3.4 шаг 4.2* (по имени факультета):
+    public Collection<Student> findStudentsByFacultyName(String facultyName) {
+        return studentRepository.findStudentsByFacultyName(facultyName);
+    }
+
+    //ДЗ-3.4 шаг 4.2 (по Id факультета):
+    public Faculty getFacultyOfStudent(Long id) {
+        return studentRepository.findById(id)
+                .map(Student::getFaculty)
+                .orElse(null);
     }
 }
 

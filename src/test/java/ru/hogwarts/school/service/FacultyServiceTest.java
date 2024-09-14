@@ -20,12 +20,14 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 
 @ExtendWith(MockitoExtension.class)
 class FacultyServiceTest {
@@ -187,32 +189,35 @@ class FacultyServiceTest {
     void shouldFindByColorIgnoreCase_WhenNullColor_ThenFaculties() {
         //test:
         Faculty faculty1 = new Faculty(1L, "АО", "синий");
-        Faculty faculty2 = new Faculty(2L, "РиРНО", "синий");
-        Faculty faculty3 = new Faculty(3L, "АВ", "синий");
-        Faculty faculty4 = new Faculty(4L, "СД", "синий");
-        Collection<Faculty> faculties = List.of(faculty1, faculty2, faculty3, faculty4);
-        Mockito.when(facultyRepositoryMock.findByColorIgnoreCase(any())).thenReturn((List<Faculty>) faculties);
+
+        Mockito.when(facultyRepositoryMock.findByColorIgnoreCase(any())).thenReturn((faculty1));
         //check:
-        assertEquals(out.findByColorIgnoreCase(any()), faculties);
+        assertEquals(out.findByColorIgnoreCase(any()), faculty1);
     }
 
-    @Test //ДЗ-3.4 шаг 4.1
-    void shouldFindFacultyByStudentsIs_WhenCorrectStudent_ThenFaculty() {
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2
+    void shouldgetStudentsOfFaculty_WhenCorrectId_ThenStudents() {
         //test:
-        Student student = new Student(1l, "Bob", 33);
+        Student student1 = new Student(1l, "Bob", 33);
+        Student student2 = new Student(2l, "Jon", 35);
+
         Faculty faculty = new Faculty(1L, "АО", "синий");
-        Mockito.when(facultyRepositoryMock.findFacultyByStudentsIs(any())).thenReturn(faculty);
+        faculty.setStudents(List.of(student1, student2));
+
+        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
         //check:
-        assertEquals(out.findFacultyByStudentsIs(student), faculty);
+        assertEquals(out.getStudentsOfFaculty(any()), faculty.getStudents());
     }
 
-    @Test  //ДЗ-3.4 шаг 4.1
-    void shouldFindFacultyByStudentsIs_WhenNotCorrectIdStudent_ThenNull() {
+    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
+    void shouldgetStudentsOfFaculty_WhenNotCorrectId_ThenEmptyList() {
         //test:
-        Student student = new Student(1l, "Bob", 33);
+        Student student1 = new Student(1l, "Bob", 33);
+        Student student2 = new Student(2l, "Jon", 35);
+
         Faculty faculty = new Faculty(1L, "АО", "синий");
-        Mockito.when(facultyRepositoryMock.findFacultyByStudentsIs(any())).thenReturn(null);
+        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
         //check:
-        assertEquals(out.findFacultyByStudentsIs(student), null);
+        assertEquals(out.getStudentsOfFaculty(any()), Collections.emptyList());
     }
 }

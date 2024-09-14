@@ -78,27 +78,29 @@ public class FacultyController {
         }
     }
 
-    //ДЗ-3.4 Введение в SQL шаг 3.2 (вариант 2 нахождения фака по его цвету, но через стандартный метод репозитория)
+    //ДЗ-3.4 Введение в SQL шаг 1.2(1) (нахождение фака по его цвету через стандартный метод репозитория)
     @GetMapping("/by-color")
-    public ResponseEntity<Collection<Faculty>> findByColorIgnoreCase(@RequestParam String color) {
+    public ResponseEntity<Faculty> findByColorIgnoreCase(@RequestParam String color) {
         return ResponseEntity.ok(facultyService.findByColorIgnoreCase(color));
     }
 
-    // ДЗ-3.4 шаг 1.2 SQL
-    @GetMapping("/by-NameAndColor") //Дополнительный метод, который не совсем по условию (не нашёл в репозитории стандартный метод получения факультета только по его имени)
+    //ДЗ-3.4 Введение в SQL шаг 1.2(2) (нахождение фака по его имени через стандартный метод репозитория)
+    @GetMapping("/by-name")
+    public ResponseEntity<Faculty> findByName(@RequestParam String name) {
+        return ResponseEntity.ok(facultyService.findByName(name));
+    }
+
+    // ДЗ-3.4 SQL шаг 1.2(3) (нахождение фака по его имени и цвету через стандартный метод репозитория - доп. метод)
+    @GetMapping("/by-nameAndColor")
     public ResponseEntity<Faculty> findByNameAndColor(@RequestParam String name,
-                                                  @RequestParam String color) {
+                                                      @RequestParam String color) {
         return ResponseEntity.ok(facultyService.findByNameAndColor(name, color));
     }
 
-    //ДЗ-3.4 шаг 4.1 (SQL) Получение факультета для студента
-    @PostMapping("/by-student")
-    public ResponseEntity<Faculty> findFacultyByStudentsIs(@RequestBody Student student) {
-        Faculty faculty = facultyService.findFacultyByStudentsIs(student);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();  //Выводим 404
-        }
-        return ResponseEntity.ok(faculty);
+    // ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
+    @GetMapping("/{id}/students")
+    public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
+        return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
     }
 }
 

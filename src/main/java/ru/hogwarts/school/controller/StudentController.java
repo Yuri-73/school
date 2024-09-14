@@ -29,7 +29,7 @@ public class StudentController {
     }
 
     @GetMapping("{id}") // GET http://localhost:8090/student/1
-    public ResponseEntity <Student> findStudent(@PathVariable Long id) { //Для получения студента из Мапы по индексу через свагер(постман)
+    public ResponseEntity<Student> findStudent(@PathVariable Long id) { //Для получения студента из Мапы по индексу через свагер(постман)
         if (studentService.findStudent(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1
         }
@@ -59,7 +59,8 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getAllStudent());
     }
 
-    @GetMapping(path = "/get/by-age")  //ДЗ-3.2
+    @GetMapping(path = "/get/by-age")
+        //ДЗ-3.2
         //localhost:8090/student/searchAge?age=22
     String getStudentByAge(@RequestParam(required = false) Integer age) {
         try {
@@ -80,10 +81,16 @@ public class StudentController {
         return ResponseEntity.ok(studentService.findByAgeBetween(min, max)); //Вызов стандартногот метода поиска студентов по отрезку возраста
     }
 
-    //ДЗ-3.4, шаг 4.2
+    //ДЗ-3.4, шаг 4.2*(по имени факультета - по своей инициативе, в условии нет; не через геттер students в faculty, а через функционал БД):
     @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?faculty_id=АО
-    public ResponseEntity<Collection<Student>> findStudentsByFaculty_name(String faculty_name) {
-        return ResponseEntity.ok(studentService.findStudentsByFaculty_name(faculty_name));
+    public ResponseEntity<Collection<Student>> findStudentsByFacultyName(String facultyName) {
+        return ResponseEntity.ok(studentService.findStudentsByFacultyName(facultyName));
+    }
+
+    //ДЗ-3.4 шаг 4.1 (SQL) Получение факультета по Id его студента
+    @GetMapping("/{id}/faculty")
+    public ResponseEntity<Faculty> getFacultyOfStudent(@PathVariable Long id) {
+        return ResponseEntity.ok(studentService.getFacultyOfStudent(id));
     }
 }
 
