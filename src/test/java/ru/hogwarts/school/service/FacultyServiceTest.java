@@ -176,8 +176,9 @@ class FacultyServiceTest {
     }
 
     //ДЗ-3.4:
-    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2 (доп-но к заданию) (можно было все тест-методы этого ДЗ не делать, потому что они, по-сути, проверяют транзит и сами себя)
-    void shouldFindByNameAndColor_WhenCorrectColorName_ThenFaculties() {
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2(2)* (доп-но к заданию)
+    // (можно было все тест-методы этого ДЗ не делать, потому что они, по-сути, проверяют транзит и сами себя)
+    void shouldFindByNameAndColor_WhenCorrectNameAndColor_ThenFaculties() {
         //test:
         Faculty faculty1 = new Faculty(1L, "АО", "синий");
         Mockito.when(facultyRepositoryMock.findByNameAndColor(any(), any())).thenReturn(faculty1);
@@ -185,7 +186,7 @@ class FacultyServiceTest {
         assertEquals(out.findByNameAndColor(any(), any()), faculty1);
     }
 
-    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2(1)
     void shouldFindByColorIgnoreCase_WhenNullColor_ThenFaculties() {
         //test:
         Faculty faculty1 = new Faculty(1L, "АО", "синий");
@@ -195,7 +196,16 @@ class FacultyServiceTest {
         assertEquals(out.findByColorIgnoreCase(any()), faculty1);
     }
 
-    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2
+    @Test //ДЗ-3.4 для метода, созданного по шагу 1.2(3)
+    void shouldFindByName_WhenCorrectName_ThenFaculties() {
+        //test:
+        Faculty faculty1 = new Faculty(1L, "АО", "синий");
+        Mockito.when(facultyRepositoryMock.findByName(any())).thenReturn(faculty1);
+        //check:
+        assertEquals(out.findByName(any()), faculty1);
+    }
+
+    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
     void shouldgetStudentsOfFaculty_WhenCorrectId_ThenStudents() {
         //test:
         Student student1 = new Student(1l, "Bob", 33);
