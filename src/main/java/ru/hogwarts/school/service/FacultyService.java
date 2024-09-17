@@ -76,10 +76,10 @@ public class FacultyService {
         return facultyRepository.findByName(name);
     }
 
-    public Collection<Student> getStudentsOfFaculty(Long id) {
-        return facultyRepository.findById(id)
-                .map(Faculty::getStudents)
-                .orElse(Collections.emptyList());
-    }
+//    public Collection<Student> getStudentsOfFaculty(Long id) {
+//        return facultyRepository.findById(id)
+//                .map(Faculty::getStudents)
+//                .orElse(Collections.emptyList());
+//    }
 }
 

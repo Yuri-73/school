@@ -205,29 +205,29 @@ class FacultyServiceTest {
         assertEquals(out.findByName(any()), faculty1);
     }
 
-    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
-    void shouldgetStudentsOfFaculty_WhenCorrectId_ThenStudents() {
-        //test:
-        Student student1 = new Student(1l, "Bob", 33);
-        Student student2 = new Student(2l, "Jon", 35);
+//    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
+//    void shouldgetStudentsOfFaculty_WhenCorrectId_ThenStudents() {
+//        //test:
+//        Student student1 = new Student(1l, "Bob", 33);
+//        Student student2 = new Student(2l, "Jon", 35);
+//
+//        Faculty faculty = new Faculty(1L, "АО", "синий");
+//        faculty.setStudents(List.of(student1, student2));
+//
+//        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
+//        //check:
+//        assertEquals(out.getStudentsOfFaculty(any()), faculty.getStudents());
+//    }
 
-        Faculty faculty = new Faculty(1L, "АО", "синий");
-        faculty.setStudents(List.of(student1, student2));
-
-        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
-        //check:
-        assertEquals(out.getStudentsOfFaculty(any()), faculty.getStudents());
-    }
-
-    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
-    void shouldgetStudentsOfFaculty_WhenNotCorrectId_ThenEmptyList() {
-        //test:
-        Student student1 = new Student(1l, "Bob", 33);
-        Student student2 = new Student(2l, "Jon", 35);
-
-        Faculty faculty = new Faculty(1L, "АО", "синий");
-        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
-        //check:
-        assertEquals(out.getStudentsOfFaculty(any()), Collections.emptyList());
-    }
+//    @Test //ДЗ-3.4 для метода, созданного по шагу 4.2
+//    void shouldgetStudentsOfFaculty_WhenNotCorrectId_ThenEmptyList() {
+//        //test:
+//        Student student1 = new Student(1l, "Bob", 33);
+//        Student student2 = new Student(2l, "Jon", 35);
+//
+//        Faculty faculty = new Faculty(1L, "АО", "синий");
+//        Mockito.when(facultyRepositoryMock.findById(any())).thenReturn(Optional.of((faculty)));
+//        //check:
+//        assertEquals(out.getStudentsOfFaculty(any()), Collections.emptyList());
+//    }
 }
