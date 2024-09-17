@@ -17,9 +17,9 @@ public class Faculty {
     private String name;
     private String color;
 
-//    @JsonBackReference
-//    @OneToMany(mappedBy = "faculty")  //создаётся в таблице студента колонка faculty_id
-////    private Collection<Student> students;
+    @JsonBackReference
+    @OneToMany(mappedBy = "faculty")  //создаётся в таблице студента колонка faculty_id
+    private Collection<Student> students;
 
     public Faculty() {
     }
@@ -54,13 +54,13 @@ public class Faculty {
         this.color = color;
     }
 
-//    public Collection<Student> getStudents() {
-//        return students;
-//    }
+    public Collection<Student> getStudents() {
+        return students;
+    }
 
-//    public void setStudents(Collection<Student> students) {
-//        this.students = students;
-//    }
+    public void setStudents(Collection<Student> students) {
+        this.students = students;
+    }
 
     @Override
     public boolean equals(Object o) {

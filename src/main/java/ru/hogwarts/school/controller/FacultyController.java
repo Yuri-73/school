@@ -98,9 +98,9 @@ public class FacultyController {
     }
 
     // ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
-//    @GetMapping("/{id}/students")
-//    public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
-//        return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
-//    }
+    @GetMapping("/{id}/students")
+    public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
+        return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
+    }
 }
 
