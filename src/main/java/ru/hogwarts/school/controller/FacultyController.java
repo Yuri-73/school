@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.exception.NoFacultyColorException;
 import ru.hogwarts.school.exception.NullEmptyColorException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.Collection;
@@ -64,9 +65,10 @@ public class FacultyController {
         return ResponseEntity.ok(facultyService.getAllFaculty());
     }
 
-    @GetMapping(path = "/searchColor")
-        //localhost:8090/faculty/searchColor?color=green
-    String getFacultyByColor(@RequestParam(required = false) String color) { //Для вывода факультета из Мапы, чей цвет совпадает с параметром входа через Свагер
+    // ДЗ-3.2 Сваггер (без репозитория)
+    @GetMapping(path = "/get/color")
+    //localhost:8090/faculty/searchColor?color=green
+    String getFacultyByColor(@RequestParam(required = false) String color) {
         try {
             return "Факультеты с таким цветом найдены: " + facultyService.getFacultyByColor(color);
         } catch (NullEmptyColorException exc) {
@@ -76,10 +78,29 @@ public class FacultyController {
         }
     }
 
-//    @GetMapping(path = "/get/by-color")
-//        //localhost:8090/faculty/get/by-color?color=22
-//    List<Faculty> findAllByColor(@RequestParam("color") String color) { //Вариант 2 по поиску Листа факультетов с одним и тем же цветом: по вебинару 3.2
-//        return facultyService.findAllByColor(color);
-//    }
+    //ДЗ-3.4 Введение в SQL шаг 1.2(1) (нахождение фака по его цвету через стандартный метод репозитория)
+    @GetMapping("/by-color")
+    public ResponseEntity<Faculty> findByColorIgnoreCase(@RequestParam String color) {
+        return ResponseEntity.ok(facultyService.findByColorIgnoreCase(color));
+    }
+
+    //ДЗ-3.4 Введение в SQL шаг 1.2(2) (нахождение фака по его имени через стандартный метод репозитория)
+    @GetMapping("/by-name")
+    public ResponseEntity<Faculty> findByName(@RequestParam String name) {
+        return ResponseEntity.ok(facultyService.findByName(name));
+    }
+
+    // ДЗ-3.4 SQL шаг 1.2(3) (нахождение фака по его имени и цвету через стандартный метод репозитория - доп. метод)
+    @GetMapping("/by-nameAndColor")
+    public ResponseEntity<Faculty> findByNameAndColor(@RequestParam String name,
+                                                      @RequestParam String color) {
+        return ResponseEntity.ok(facultyService.findByNameAndColor(name, color));
+    }
+
+    // ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
+    @GetMapping("/{id}/students")
+    public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
+        return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
+    }
 }
 
