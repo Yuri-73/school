@@ -41,7 +41,7 @@ public class StudentAvatarService {
         Path filePath = Path.of(avatarsDir, id + "." + getExtension(file.getOriginalFilename()));  // Путь к файлу сохраняем в переменной filePath
         System.out.println("id5 = " + id);
         Files.createDirectories(filePath.getParent()); // Создаем директорию для хранения файла
-        Files.deleteIfExists(filePath);  // Удаляем из созданной папки предыдущий файл, если он там был:
+        Files.deleteIfExists(filePath);  // Удаляем из созданной папки предыдущий файл, если он там был
         try (InputStream is = file.getInputStream(); // Открываем входной поток для приёма файла file
              OutputStream os = Files.newOutputStream(filePath, CREATE_NEW); // Создаём выходной поток и в пустой файл
              //на ЖД ('id') по переменной filePath по байту перекачиваем содержимое файла file
@@ -58,7 +58,6 @@ public class StudentAvatarService {
         avatar.setData(generateImagePreview(filePath)); // Создаём маленькую картинку, который с помощью метода generateImagePreview() уменьшает размер картинки,
         //и ложим в массив байтов для БД.
         studentAvatarRepository.save(avatar); // Сохраняем этот объект в БД. Фактически будет сохранен массив байтов, а все остальные переменные объекта создавались для размещения на диске.
-
     }
 
     public Avatar findAvatar(Long id) {

@@ -36,7 +36,7 @@ public class AvatarController {
 
     @GetMapping(value = "/{id}/avatar/preview")
     public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
-        // Чтение файла с из БД (здесь id студента в параметре, а не id аватара!)
+        // Чтение файла с из БД (здесь id студента)
         Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекта из БД
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType())); // Преобразование строчки с названием типа обратно в MediaType.
@@ -51,7 +51,7 @@ public class AvatarController {
         Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекте. Но почему получаем также, как из БД?   ***?***
         Path path = Path.of(avatar.getFilePath()); // Путь к файлу на ЖД
         try (InputStream is = Files.newInputStream(path); // Объявляем переменные обоих потоков.
-             // Выходной поток уже был создан, поэтому не через нью, а через геттер:
+             // Выходной поток уже был создан, поэтому не через new, а через геттер:
              OutputStream os = response.getOutputStream()) {
             response.setContentType(avatar.getMediaType()); // Оба заголовка. Вернем тот же MediaType, который был сохранён в БД.
             response.setContentLength((int)avatar.getFileSize());

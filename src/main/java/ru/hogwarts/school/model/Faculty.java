@@ -1,6 +1,7 @@
 package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
@@ -12,13 +13,13 @@ import java.util.Objects;
 public class Faculty {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(columnDefinition = "oid")
     private Long id;
     private String name;
     private String color;
 
-    @JsonBackReference
+
     @OneToMany(mappedBy = "faculty")  //создаётся в таблице студента колонка faculty_id
+//    @JsonBackReference - применять нельзя, выдаёт ошибку
     private Collection<Student> students;
 
     public Faculty() {
@@ -54,6 +55,7 @@ public class Faculty {
         this.color = color;
     }
 
+    @JsonIgnore  //Для исключения закольцовывания!!!
     public Collection<Student> getStudents() {
         return students;
     }

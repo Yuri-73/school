@@ -74,7 +74,7 @@ public class StudentService {
         return studentRepository.findStudentsByFacultyName(facultyName);
     }
 
-    //ДЗ-3.4 шаг 4.2 (по Id факультета):
+    //ДЗ-3.4 шаг 4.2 (по Id студента):
     public Faculty getFacultyOfStudent(Long id) {
         return studentRepository.findById(id)
                 .map(Student::getFaculty)

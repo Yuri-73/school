@@ -34,7 +34,7 @@ public class FacultyController {
     }
 
     @GetMapping("{id}") // GET http://localhost:8090/faculty/1
-    public ResponseEntity<Faculty> findFaculty(@PathVariable Long id) { //Для получения факультета из Мапы по индексу через свагер(постман)
+    public ResponseEntity<Faculty> findFaculty(@PathVariable Long id) { //Для получения факультета по индексу через свагер(постман)
         if (facultyService.findFaculty(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1
         }
@@ -43,7 +43,7 @@ public class FacultyController {
 
     @PutMapping // PUT http://localhost:8090/faculty
 //    @ApiResponses(code = 405, message = "Студент не найден")
-    public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) { //Для редактирования факультетов в Мапе через свагер(постман)
+    public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) { //Для редактирования факультетов через свагер(постман)
         // Если такого студента в Мапе нет, то выйдет 404
         if (facultyService.editFaculty(faculty) == null) {
             return ResponseEntity.notFound().build(); //Если факультет с этим Id не найден, то выскочит по умолчанию 404. Вариант 2
@@ -52,7 +52,7 @@ public class FacultyController {
     }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/faculty/1
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) { //Для удаления факультета по id из Мапы через Свагер
+    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) { //Для удаления факультета по id через Свагер
         Faculty faculty = facultyService.deleteFaculty(id);
         if (faculty == null) {
             return ResponseEntity.status(405).build(); //Если факультета с этим Id нет, то выскочит 405. Вариант 3
@@ -61,7 +61,7 @@ public class FacultyController {
     }
 
     @GetMapping() // GET http://localhost:8090/faculty
-    public ResponseEntity<Collection<Faculty>> getAllFaculty() { //Для вывода всех факультетов Мапы через свагер(постман)
+    public ResponseEntity<Collection<Faculty>> getAllFaculty() { //Для вывода всех факультетов через свагер(постман)
         return ResponseEntity.ok(facultyService.getAllFaculty());
     }
 
