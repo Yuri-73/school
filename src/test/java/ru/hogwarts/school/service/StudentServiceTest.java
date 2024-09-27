@@ -9,10 +9,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
-import ru.hogwarts.school.exception.NoFacultyColorException;
-import ru.hogwarts.school.exception.NoStudentAgeException;
-import ru.hogwarts.school.exception.NullAgeException;
-import ru.hogwarts.school.exception.NullEmptyColorException;
+import ru.hogwarts.school.exception.*;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.StudentRepository;
@@ -58,11 +55,11 @@ class StudentServiceTest {
     }
 
     @Test
-    void shouldFindStudent_WhenNotCorrectId_ThenNull() {
+    void shouldFindStudent_WhenNotCorrectId_ThenStudentNotFoundException() {
         //test
         Mockito.when(studentRepositoryMock.findById(any())).thenReturn(Optional.ofNullable(null));
         //check
-        assertEquals(out.findStudent(2l), null);
+        Assertions.assertThrows(StudentNotFoundException.class, () -> out.findStudent(2l));
     }
 
     @Test

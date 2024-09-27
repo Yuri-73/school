@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.exception.NoStudentAgeException;
 import ru.hogwarts.school.exception.NullAgeException;
+import ru.hogwarts.school.exception.StudentNotFoundException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -26,7 +27,7 @@ public class StudentService {
     }
 
     public Student findStudent(Long id) {
-        Student student = studentRepository.findById(id).orElse(null);
+        Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
         return student;
     }
 
@@ -73,7 +74,7 @@ public class StudentService {
         return studentRepository.findStudentsByFacultyName(facultyName);
     }
 
-    //ДЗ-3.4 шаг 4.2 (по Id факультета):
+    //ДЗ-3.4 шаг 4.2 (по Id студента):
     public Faculty getFacultyOfStudent(Long id) {
         return studentRepository.findById(id)
                 .map(Student::getFaculty)

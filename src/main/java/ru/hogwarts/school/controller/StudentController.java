@@ -29,7 +29,7 @@ public class StudentController {
     }
 
     @GetMapping("{id}") // GET http://localhost:8090/student/1
-    public ResponseEntity<Student> findStudent(@PathVariable Long id) { //Для получения студента из Мапы по индексу через свагер(постман)
+    public ResponseEntity<Student> findStudent(@PathVariable Long id) { //Для получения студента из по индексу через свагер(постман)
         if (studentService.findStudent(id) == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1
         }
@@ -37,8 +37,7 @@ public class StudentController {
     }
 
     @PutMapping // PUT http://localhost:8090/student
-    public ResponseEntity<Student> editStudent(@RequestBody Student student) { //Для редактирования студентов в Мапе через свагер(постман).
-        // Если такого студента в Мапе нет, то выйдет 404
+    public ResponseEntity<Student> editStudent(@RequestBody Student student) { //Для редактирования студентов через свагер(постман).
         if (studentService.editStudent(student) == null) {
             return ResponseEntity.notFound().build(); //Если студента с этим Id не найдено, то выскочит по умолчанию 404. Вариант 2а
         }
@@ -46,16 +45,16 @@ public class StudentController {
     }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/student/1
-    public ResponseEntity<Student> deleteStudent(@PathVariable Long id) { //Для удаления студента по id из Мапы через Свагер
+    public ResponseEntity<Student> deleteStudent(@PathVariable Long id) { //Для удаления студента по id через Свагер
         Student student = studentService.deleteStudent(id);
         if (student == null) {
-            return ResponseEntity.status(405).build(); //Если студента с этим Id нет, то выскочит 405. Вариант 3
+            return ResponseEntity.status(405).build(); //Если студента с этим Id нет, то 405. Вариант 3
         }
-        return ResponseEntity.ok(student); //При удалении студента по выбранному Id по умолчанию пропишется 404.
+        return ResponseEntity.ok(student);
     }
 
     @GetMapping() // GET http://localhost:8090/student
-    public ResponseEntity<Collection<Student>> getAllStudent() { //Для вывода всех студентов Мапы через свагер(постман)
+    public ResponseEntity<Collection<Student>> getAllStudent() { //Для вывода всех студентов через свагер(постман)
         return ResponseEntity.ok(studentService.getAllStudent());
     }
 
@@ -81,7 +80,7 @@ public class StudentController {
         return ResponseEntity.ok(studentService.findByAgeBetween(min, max)); //Вызов стандартногот метода поиска студентов по отрезку возраста
     }
 
-    //ДЗ-3.4, шаг 4.2*(по имени факультета - по своей инициативе, в условии нет; не через геттер students в faculty, а через функционал БД):
+    //ДЗ-3.4, шаг 4.2*(по имени факультета - по своей инициативе, в условии нет; не через геттер students'а в faculty, а через функционал БД:
     @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?faculty_id=АО
     public ResponseEntity<Collection<Student>> findStudentsByFacultyName(String facultyName) {
         return ResponseEntity.ok(studentService.findStudentsByFacultyName(facultyName));

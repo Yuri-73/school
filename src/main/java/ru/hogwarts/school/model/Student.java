@@ -10,13 +10,19 @@ import java.util.Objects;
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Column(columnDefinition = "oid")
     private Long id;
     private String name;
     private int age;
 
-    @ManyToOne
-    @JsonManagedReference
+//    @OneToOne
+//    @JoinColumn(name = "avatar_id")
+//    private Avatar avatar;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+
     @JoinColumn(name = "faculty_id")
+//    @JsonManagedReference - применять нельзя, выдаёт ошибку
     private Faculty faculty;
 
     public Student() {
