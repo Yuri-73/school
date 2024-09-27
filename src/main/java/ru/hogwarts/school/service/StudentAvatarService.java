@@ -24,8 +24,8 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 public class StudentAvatarService {
 
     @Value("${students.avatar.dir.path}") //Путь, где будет храниться наша картинка.
-
     private String avatarsDir;
+
     private final StudentService studentService;
     private final StudentAvatarRepository studentAvatarRepository;
 
@@ -39,7 +39,7 @@ public class StudentAvatarService {
         Student student = studentService.findStudent(id); // Находим объект студента по id.
 
         Path filePath = Path.of(avatarsDir, id + "." + getExtension(file.getOriginalFilename()));  // Путь к файлу сохраняем в переменной filePath
-        System.out.println("id5 = " + id);
+        System.out.println("id1 = " + id);
         Files.createDirectories(filePath.getParent()); // Создаем директорию для хранения файла
         Files.deleteIfExists(filePath);  // Удаляем из созданной папки предыдущий файл, если он там был
         try (InputStream is = file.getInputStream(); // Открываем входной поток для приёма файла file
@@ -56,7 +56,9 @@ public class StudentAvatarService {
         avatar.setFileSize(file.getSize()); // Указываем его размер
         avatar.setMediaType(file.getContentType()); // Указываем его контент
         avatar.setData(generateImagePreview(filePath)); // Создаём маленькую картинку, который с помощью метода generateImagePreview() уменьшает размер картинки,
+//        avatar.setData(file.getBytes()); Вот если вместо верхней строки вставить эту, тест на данный метод пройдёт, но почему-то пропадут картинки в файловой системе!
         //и ложим в массив байтов для БД.
+
         studentAvatarRepository.save(avatar); // Сохраняем этот объект в БД. Фактически будет сохранен массив байтов, а все остальные переменные объекта создавались для размещения на диске.
     }
 
@@ -67,6 +69,7 @@ public class StudentAvatarService {
 
     public byte[] generateImagePreview(Path filePath) throws IOException { //Метод уменьшения картинки для БД
         try (InputStream is = Files.newInputStream(filePath);
+
              BufferedInputStream bis = new BufferedInputStream(is, 1024);
              ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             BufferedImage image = ImageIO.read(bis);
@@ -76,6 +79,7 @@ public class StudentAvatarService {
             graphics.drawImage(image, 0, 0, 100, height, null);
             graphics.dispose();
             ImageIO.write(date, getExtension(filePath.getFileName().toString()), baos);
+
             return baos.toByteArray();
         }
     }

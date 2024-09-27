@@ -37,8 +37,9 @@ class StudentServiceTest {
 
     @Test
     void shouldCreateStudent_WhenStudent_ThenCorrectResult() {
-        //test
+        ////given:
         Student student1 = new Student(1L, "Юрий", 24);
+        //when:
         Mockito.when(studentRepositoryMock.save(student1)).thenReturn(student1);
         //check
         assertEquals(out.createStudent(student1), student1);
@@ -212,5 +213,41 @@ class StudentServiceTest {
         Mockito.when(studentRepositoryMock.findById(anyLong())).thenReturn(Optional.of((student)));
         //check:
         assertEquals(out.getFacultyOfStudent(anyLong()), null);
+    }
+
+    @Test
+    void createStudent() {
+    }
+
+    @Test
+    void findStudent() {
+    }
+
+    @Test
+    void editStudent() {
+    }
+
+    @Test
+    void deleteStudent() {
+    }
+
+    @Test
+    void getAllStudent() {
+    }
+
+    @Test
+    void getStudentByAge() {
+    }
+
+    @Test
+    void findByAgeBetween() {
+    }
+
+    @Test
+    void findStudentsByFacultyName() {
+    }
+
+    @Test
+    void getFacultyOfStudent() {
     }
 }

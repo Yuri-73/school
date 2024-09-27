@@ -60,7 +60,6 @@ public class StudentController {
 
     @GetMapping(path = "/get/by-age")
         //ДЗ-3.2
-        //localhost:8090/student/searchAge?age=22
     String getStudentByAge(@RequestParam(required = false) Integer age) {
         try {
             return "Студенты с таким возрастом: " + studentService.getStudentByAge(age);
@@ -81,7 +80,7 @@ public class StudentController {
     }
 
     //ДЗ-3.4, шаг 4.2*(по имени факультета - по своей инициативе, в условии нет; не через геттер students'а в faculty, а через функционал БД:
-    @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?faculty_id=АО
+    @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?facultyName=АО
     public ResponseEntity<Collection<Student>> findStudentsByFacultyName(String facultyName) {
         return ResponseEntity.ok(studentService.findStudentsByFacultyName(facultyName));
     }
