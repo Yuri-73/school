@@ -72,7 +72,7 @@ public class StudentController {
 
     // ДЗ-3.4, шаг 1.1
     @GetMapping("/age") // GET http://localhost:8090/student/age?min=22&max=23
-    public ResponseEntity<List<Student>> findByAgeStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
+    public ResponseEntity<List<Student>> findByAgeBetweenStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
         if (studentService.findByAgeBetween(min, max).isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1;
         }
