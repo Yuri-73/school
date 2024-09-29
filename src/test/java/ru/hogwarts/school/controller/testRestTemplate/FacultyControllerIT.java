@@ -16,8 +16,11 @@ import ru.hogwarts.school.repository.FacultyRepository;
 import java.util.Collection;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-//Интеграционные тесты: проверка от реального URL в виде шаблона TestRestTemplate до работы БД
+
+//Интеграционные тесты: проверка от реального URL в виде шаблона TestRestTemplate до работы БД.
+//Добавил решение от Ильи с вебинара для теста getAllFacultiesTest() с помощью массива JSON
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FacultyControllerIT {
 
@@ -168,13 +171,27 @@ class FacultyControllerIT {
         var faculties = result.getBody();
         //check:
         Assertions.assertThat(faculties).isNotNull();
-        Assertions.assertThat(faculties.size()).isEqualTo(9);  //6 факультетов уже имеется в БД, к ним добаляем 3
+//        Assertions.assertThat(faculties.size()).isEqualTo(7);  //4 факультетов уже имеется в БД, к ним добаляем 3. Лучше эту строку закомментировать, т.к. количество объектов в базе может поменяться
         Assertions.assertThat(faculties).contains(new Faculty(5l, "АО", "голубой"));
         Assertions.assertThat(faculties).contains(new Faculty(f1.getId(), "test1", "red"));
         //cleaning:
         repository.deleteById(f1.getId());
         repository.deleteById(f2.getId());
         repository.deleteById(f3.getId());
+
+        //Тест от Ильи Савинова из вебинара 3.6 [01:31:00] через массив JSON:
+        //Начальные условия:
+        ResponseEntity<Faculty> newFacultyResponse = restTemplate.postForEntity("http://localhost:" + port + "/faculty", new Faculty(1l, "Name", "Red"), Faculty.class);
+        //Вызов тестируемого метода через массив JSON:
+        ResponseEntity<Faculty[]> response = restTemplate.getForEntity("http://localhost:" + port + "/faculty", Faculty[].class);
+        Проверка:
+        assertTrue(response.getStatusCode().is2xxSuccessful());
+        Assertions.assertThat(response.getBody()).isNotNull();
+        Faculty[] faculties1 = response.getBody();
+        assertThat(faculties1).contains(newFacultyResponse.getBody());
+//        assertThat(faculties1[0].getName()).isEqualTo("Name"); //Не пройдёт, потому что не знаю место расположения newFacultyResponse.getBody() в массиве (он у меня изначально заполнен)
+        //cleaning:
+        repository.deleteById(f3.getId() + 1l); //Не смог вывести id из newFacultyResponse (newFacultyResponse..getBody().getId не проходит)
     }
 
     @Test

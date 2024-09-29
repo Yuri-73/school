@@ -44,9 +44,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-//Этот род тестов называется компонентным, а не интеграционным. Полноценное URL не создаётся, в отличие от TestRestTemplate, а имитируется (мокируется)
+//Этот род тестов называется компонентным, а не интеграционным. Полноценное URL не создаётся, в отличие от TestRestTemplate, а имитируется (мокируется).
+// Кроме моего решения представлены тесты от Громовой и Ильи Савинова
 @WebMvcTest(FacultyController.class)
 public class FacultyControllerWebMvcTest {
     @Autowired
@@ -373,6 +375,19 @@ public class FacultyControllerWebMvcTest {
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(Collections.singletonList(faculty))));
+
+        //Вариант от Ильи (вебинар 3.6, время 01.31.00)
+        //Подготовка данных:
+        when(facultyRepository.findAll()).thenReturn(List.of(new Faculty(1l, "Name", "Red"), new Faculty(2l, "Name2", "Yelow")));
+        //Тестирование и контроль:
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/faculty"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].name").value("Name"))
+                .andExpect(jsonPath("$[1].name").value("Name2"))
+                .andExpect(jsonPath("$[0].color").value("Red"));
     }
 
     @Test
