@@ -135,12 +135,12 @@ class StudentServiceTest {
         Collection<Student> students = List.of(student1, student2, student3, student4);
         Mockito.when(studentRepositoryMock.findAll()).thenReturn((List<Student>) students);
         //check:
-        assertTrue(out.getStudentByAge(24).contains("Юрий")); //Вариант 1 (через jupiter.api)
-        assertTrue(out.getStudentByAge(24).contains("Пётр"));
+        assertTrue(out.getStudentByAge(24).contains(student1)); //Вариант 1 (через jupiter.api)
+        assertTrue(out.getStudentByAge(24).contains(student3));
         assertEquals(out.getStudentByAge(24).size(), 2);
 
-        Collection<String> students2 = out.getStudentByAge(29); //Вариант 2 (через assertj), компоненты можно вразброс
-        org.assertj.core.api.Assertions.assertThat(students2).containsAll(List.of(student2.getName()));
+        Collection<Student> students2 = out.getStudentByAge(29); //Вариант 2 (через assertj), компоненты можно вразброс
+        org.assertj.core.api.Assertions.assertThat(students2).containsAll(List.of(student2));
     }
 
     @Test

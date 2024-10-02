@@ -50,17 +50,16 @@ public class StudentService {
     }
 
     //ДЗ-3.3:
-    public Collection<String> getStudentByAge(Integer age) {
+    public Collection<Student> getStudentByAge(Integer age) {
         if (age <= 0) {
-            throw new NullAgeException();
+            throw new NullAgeException(age);
         }
-        Collection<String> studentListByAge = getAllStudent()
+        Collection<Student> studentListByAge = getAllStudent()
                 .stream()
                 .filter(e -> e.getAge() == age)
-                .map(e -> e.getName())
                 .collect(Collectors.toList());
         if (studentListByAge.isEmpty())
-            throw new NoStudentAgeException();
+            throw new NoStudentAgeException(age);
         return studentListByAge;
     }
 

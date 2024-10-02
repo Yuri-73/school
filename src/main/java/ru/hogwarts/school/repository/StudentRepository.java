@@ -14,5 +14,5 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Collection<Student> findStudentsByFacultyName(String facultyName); //Стандартный метод поиска всех студентов по имени факультета
 
-    public void deleteById(Long id);
+    public void deleteById(Long id);  //Для очищения интеграционных тестов
 }

@@ -72,7 +72,7 @@ import static org.mockito.Mockito.when;
 //   но почему-то пропадают картинки в файловой системе и Сваггер при гет-запросе картинки выдаёт статус 500, а при гет-запросе из БД 200 и картинку выдаёт!
 //   Причину необходимости замены на avatar.setData(file.getBytes()) нашёл: почему-то в методе generateImagePreview(Path filePath) после строки
 //   BufferedImage image = ImageIO.read(bis); и System.out.println("image = " +image); программа падает, т.к. image отчего-то равна null
-// В помощь: https://github.com/Kseniia313/HogwartsSchool3.2
+// В помощь: https://github.com/Kseniia313/HogwartsSchool3.2 и https://github.com/Tavkel/hogwarts_db/blob/master/src/test/java/ru/hogwarts/school/services/implementations/AvatarServiceImplTest.java
 
 //    @Test
 //    void findAvatar() {

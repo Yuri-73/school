@@ -23,7 +23,7 @@ public class StudentController {
     }
 
     @PostMapping // POST http://localhost:8090/student
-    public ResponseEntity<Student> createStudent(@RequestBody Student student) { //Для записи студентов по телу через свагер(постман)
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) { //Для записи студентов по телу запроса через свагер(постман)
         Student student1 = studentService.createStudent(student);
         return ResponseEntity.ok(student1); //В свагере увидим созданный объект в JSON
     }
@@ -59,15 +59,9 @@ public class StudentController {
     }
 
     @GetMapping(path = "/get/by-age")
-        //ДЗ-3.2
-    String getStudentByAge(@RequestParam(required = false) Integer age) {
-        try {
-            return "Студенты с таким возрастом: " + studentService.getStudentByAge(age);
-        } catch (NullAgeException exc) {
-            return "Параметр адреса не задан";
-        } catch (NoStudentAgeException exception) {
-            return "Студентов с таким возрастом в коллекции нет";
-        }
+        //ДЗ-3.2 изначально без репозитория, но теперь работает через getAllStudent()
+    public ResponseEntity<Collection<Student>> getStudentByAge(@RequestParam(required = false) Integer age) {
+            return ResponseEntity.ok(studentService.getStudentByAge(age));
     }
 
     // ДЗ-3.4, шаг 1.1
