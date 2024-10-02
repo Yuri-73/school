@@ -91,8 +91,9 @@ class StudentControllerIT {
         var s = student(name, age);
         //test:
         var saved = restTemplate.postForObject("/student", s, Student.class);  //работа метода контроллера через шаблон TestRestTemplate
-        saved.setName("name2");
-
+        System.out.println("saved.getName: " + saved.getName());
+        saved.setName("name2");  //Имя студента изменили, но его ID остался прежним
+        System.out.println("saved.getName: " + saved.getName());
         ResponseEntity<Student> studentEntityPut = restTemplate.exchange(
                 "/student", HttpMethod.PUT, new HttpEntity<>(saved), Student.class
         );
@@ -146,8 +147,8 @@ class StudentControllerIT {
         var students = result.getBody();
         //check:
         Assertions.assertThat(students).isNotNull();
-        Assertions.assertThat(students.size()).isEqualTo(7);  //4 студента уже имеется в БД, к ним добаляем 3
-        Assertions.assertThat(students).contains(new Student(1l, "Валерий", 20));
+        Assertions.assertThat(students.size()).isEqualTo(5);  //2 студента уже имеется в БД, к ним добаляем 3
+        Assertions.assertThat(students).contains(new Student(4l, "Елена", 35));
         Assertions.assertThat(students).contains(new Student(s1.getId(), "test1", 24));
         Assertions.assertThat(students).contains(new Student(s2.getId(), "test2", 25));
         //cleaning:
@@ -161,11 +162,21 @@ class StudentControllerIT {
         //initial data:
         var s = student(name, age);
         var saved = restTemplate.postForObject("/student", s, Student.class);
+//        //test:
+//         result[] = restTemplate.getForObject("/student/get/by-age?age=22", Student[].class);
         //test:
-        var result = restTemplate.getForObject("/student/get/by-age?age=22", String.class);
+        var result = restTemplate.exchange("//student/get/by-age?age=22",
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Collection<Student>>() {
+                });
+
+        var students = result.getBody();
+
         //check:
-        Assertions.assertThat(result).isEqualTo("Студенты с таким возрастом: [Bob]");
-        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(students).contains(saved);
+        Assertions.assertThat(students).isNotNull();
+        Assertions.assertThat(students.size()).isEqualTo(1);
         //cleaning:
         repository.deleteById(saved.getId());
         //test:
