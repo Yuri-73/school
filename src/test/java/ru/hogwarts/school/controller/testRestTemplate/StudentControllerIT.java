@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
@@ -15,6 +16,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
+import ru.hogwarts.school.service.StudentAvatarService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
@@ -40,10 +42,15 @@ class StudentControllerIT {
 
     @Autowired
     private TestRestTemplate postTemplate;
+
     @Autowired
     private TestRestTemplate putTemplate;
+
     @Autowired
     private StudentService studentService;
+
+    @MockBean
+    private StudentAvatarService studentAvatarService;  //Без этого бина все тесты отказываются работать. Для чего-то тестовой БД он нужен!
 
     private static Long id = 164L;
     private static String name = "Bob";
@@ -67,7 +74,7 @@ class StudentControllerIT {
         Assertions.assertThat(result.getId()).isNotNull();
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());  //Очищение от тестовых данных
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -82,7 +89,7 @@ class StudentControllerIT {
         Assertions.assertThat(result.getAge()).isEqualTo(age);
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -101,7 +108,7 @@ class StudentControllerIT {
         assertThat(studentEntityPut.getBody().getName()).isEqualTo("name2");
         assertThat(studentEntityPut.getBody().getAge()).isEqualTo(age);
         //cleaning:
-        repository.deleteById(saved.getId());
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -147,12 +154,12 @@ class StudentControllerIT {
         var students = result.getBody();
         //check:
         Assertions.assertThat(students).isNotNull();
-        Assertions.assertThat(students.size()).isEqualTo(5);  //2 студента уже имеется в БД, к ним добаляем 3
-        Assertions.assertThat(students).contains(new Student(4l, "Елена", 35));
+        Assertions.assertThat(students.size()).isEqualTo(3);  //2 студента уже имеется в БД, к ним добаляем 3
+//        Assertions.assertThat(students).contains(new Student(4l, "Елена", 35));
         Assertions.assertThat(students).contains(new Student(s1.getId(), "test1", 24));
         Assertions.assertThat(students).contains(new Student(s2.getId(), "test2", 25));
         //cleaning:
-        repository.deleteById(s1.getId());  //Очищение от тестовых данных
+        repository.deleteById(s1.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         repository.deleteById(s2.getId());
         repository.deleteById(s3.getId());
     }
@@ -178,7 +185,7 @@ class StudentControllerIT {
         Assertions.assertThat(students).isNotNull();
         Assertions.assertThat(students.size()).isEqualTo(1);
         //cleaning:
-        repository.deleteById(saved.getId());
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         //test:
         ResponseEntity<Student> resultAfterDelete = restTemplate.exchange("/student/" + saved.getId(),
                 HttpMethod.GET, null, Student.class);
@@ -203,7 +210,8 @@ class StudentControllerIT {
         Assertions.assertThat(students).isNotNull();
         Assertions.assertThat(students.size()).isEqualTo(2);
         Assertions.assertThat(students).containsExactly(s1, s2);
-        //cleaning:
+
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         ResponseEntity<Student> studentEntity1 = restTemplate.exchange(
                 "/student/" + s1.getId(),
                 HttpMethod.DELETE, null, Student.class
@@ -251,7 +259,8 @@ class StudentControllerIT {
 
         Assertions.assertThat(saved.getName()).isEqualTo(name);
         Assertions.assertThat(saved.getAge()).isEqualTo(age);
-        //cleaning:
+
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         repository.deleteById(saved.getId());  //Удаляем тестового студента
         facultyRepository.deleteById(savedFaculty.getId());  //Удаляем тестовый факультет
     }
@@ -286,7 +295,7 @@ class StudentControllerIT {
                 HttpMethod.DELETE, null, Student.class
         );
         //cleaning faculty:
-        facultyRepository.deleteById(f.getId());
+        facultyRepository.deleteById(f.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     private static Student student(String name, int age) {

@@ -4,14 +4,17 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import ru.hogwarts.school.controller.AvatarController;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
+import ru.hogwarts.school.service.StudentAvatarService;
 
 import java.util.Collection;
 
@@ -29,6 +32,10 @@ class FacultyControllerIT {
 
     @Autowired
     private FacultyController facultyController;
+
+    @MockBean
+    private StudentAvatarService studentAvatarService;  //Без этого бина все тесты отказываются работать. Для чего-то тестовой БД он нужен!
+
 
     @Autowired
     private FacultyRepository repository;
@@ -58,7 +65,7 @@ class FacultyControllerIT {
         Assertions.assertThat(result.getId()).isNotNull();
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());  //Очищение БД факультета от тестовых данных
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама!
     }
 
     static Faculty faculty(String name, String color) {
@@ -87,7 +94,7 @@ class FacultyControllerIT {
         Assertions.assertThat(result.getColor()).isEqualTo("anyColor");
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -107,7 +114,7 @@ class FacultyControllerIT {
                 .assertThat(this.restTemplate.getForObject("http://localhost:" + port + "/faculty" + "/by-nameAndColor?name=f1&color=color", Faculty.class))
                 .isNull();  //Заведомо отсутствующий цвет
         //cleaning:
-        repository.deleteById(saved.getId());
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -127,7 +134,7 @@ class FacultyControllerIT {
         Assertions.assertThat(facultyEntityPut.getStatusCode()).isEqualTo(HttpStatus.OK);
         Assertions.assertThat(facultyEntityPut.getHeaders().getContentType().equals(MediaType.APPLICATION_JSON));
         //cleaning:
-        repository.deleteById(saved.getId());
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -172,9 +179,10 @@ class FacultyControllerIT {
         //check:
         Assertions.assertThat(faculties).isNotNull();
 //        Assertions.assertThat(faculties.size()).isEqualTo(7);  //4 факультетов уже имеется в БД, к ним добаляем 3. Лучше эту строку закомментировать, т.к. количество объектов в базе может поменяться
-        Assertions.assertThat(faculties).contains(new Faculty(5l, "АО", "голубой"));
+//        Assertions.assertThat(faculties).contains(new Faculty(5l, "АО", "голубой"));
         Assertions.assertThat(faculties).contains(new Faculty(f1.getId(), "test1", "red"));
-        //cleaning:
+
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         repository.deleteById(f1.getId());
         repository.deleteById(f2.getId());
         repository.deleteById(f3.getId());
@@ -190,7 +198,8 @@ class FacultyControllerIT {
         Faculty[] faculties1 = response.getBody();
         assertThat(faculties1).contains(newFacultyResponse.getBody());
 //        assertThat(faculties1[0].getName()).isEqualTo("Name"); //Не пройдёт, потому что не знаю место расположения newFacultyResponse.getBody() в массиве (он у меня изначально заполнен)
-        //cleaning:
+
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         repository.deleteById(f3.getId() + 1l); //Не смог вывести id из newFacultyResponse (newFacultyResponse..getBody().getId не проходит)
     }
 
@@ -231,7 +240,7 @@ class FacultyControllerIT {
                 HttpMethod.DELETE, null, Student.class
         );
         //cleaning faculty:
-        repository.deleteById(f.getId());
+        repository.deleteById(f.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
     }
 
     @Test
@@ -246,7 +255,7 @@ class FacultyControllerIT {
         Assertions.assertThat(result.getColor()).isEqualTo("anyColor");
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но здесь по логике оно нужно.
         //test:
         ResponseEntity<Faculty> resultAfterDelete = restTemplate.exchange("/faculty/" + result.getId(),
                 HttpMethod.GET, null, Faculty.class);
@@ -266,7 +275,7 @@ class FacultyControllerIT {
         Assertions.assertThat(result.getColor()).isEqualTo("anyColor");
         Assertions.assertThat(result).isNotNull();
         //cleaning:
-        repository.deleteById(result.getId());
+        repository.deleteById(result.getId());  //Очищение от тестовых данных. Но здесь по логике оно нужно.
         //test:
         ResponseEntity<Faculty> resultAfterDelete = restTemplate.exchange("/faculty/" + result.getId(),
                 HttpMethod.GET, null, Faculty.class);
@@ -284,7 +293,7 @@ class FacultyControllerIT {
         //check:
         Assertions.assertThat(result).isEqualTo("Факультеты с таким цветом найдены: [f1]");
         //cleaning:
-        repository.deleteById(saved.getId());
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но здесь по логике оно нужно.
         //test:
         ResponseEntity<Faculty> resultAfterDelete = restTemplate.exchange("/faculty/" + saved.getId(),
                 HttpMethod.GET, null, Faculty.class);  //Почему работает только с Id?
