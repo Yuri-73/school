@@ -154,7 +154,7 @@ class StudentControllerIT {
         var students = result.getBody();
         //check:
         Assertions.assertThat(students).isNotNull();
-        Assertions.assertThat(students.size()).isEqualTo(3);  //2 студента уже имеется в БД, к ним добаляем 3
+        Assertions.assertThat(students.size()).isEqualTo(3);  //В тест-базе только тестовые студенты
 //        Assertions.assertThat(students).contains(new Student(4l, "Елена", 35));
         Assertions.assertThat(students).contains(new Student(s1.getId(), "test1", 24));
         Assertions.assertThat(students).contains(new Student(s2.getId(), "test2", 25));
@@ -185,7 +185,7 @@ class StudentControllerIT {
         Assertions.assertThat(students).isNotNull();
         Assertions.assertThat(students.size()).isEqualTo(1);
         //cleaning:
-        repository.deleteById(saved.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
+        repository.deleteById(saved.getId());  //Очищение от тестовых данных.
         //test:
         ResponseEntity<Student> resultAfterDelete = restTemplate.exchange("/student/" + saved.getId(),
                 HttpMethod.GET, null, Student.class);
@@ -243,6 +243,7 @@ class StudentControllerIT {
         Student saved = restTemplate.postForObject("/student", s, Student.class);
 
 //        Faculty result = restTemplate.getForObject("http://localhost:" + port + "/student/" + saved.getId() + "/faculty", Faculty.class); //Можно и так
+
         //test:
         ResponseEntity<Faculty> responseEntity = restTemplate.exchange(
                 "/student/" + saved.getId() + "/faculty",

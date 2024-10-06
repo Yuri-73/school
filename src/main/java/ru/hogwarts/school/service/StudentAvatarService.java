@@ -23,15 +23,16 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class StudentAvatarService {
 
-    @Value("${students.avatar.dir.path}") //Путь, где будет храниться наша картинка.
+//    @Value("${students.avatar.dir.path}") //Путь, где будет храниться наша картинка.
     private String avatarsDir;
 
     private final StudentService studentService;
     private final StudentAvatarRepository studentAvatarRepository;
 
-    public StudentAvatarService(StudentService studentService, StudentAvatarRepository studentAvatarRepository) {
+    public StudentAvatarService(StudentService studentService, StudentAvatarRepository studentAvatarRepository, @Value("${students.avatar.dir.path}") String avatarsDir)  {
         this.studentService = studentService;
         this.studentAvatarRepository = studentAvatarRepository;
+        this.avatarsDir = avatarsDir;
     }
 
     public void uploadAvatar(Long id, MultipartFile file) throws IOException { // Метод входного потока для загрузки файла картинки

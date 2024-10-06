@@ -36,7 +36,6 @@ class FacultyControllerIT {
     @MockBean
     private StudentAvatarService studentAvatarService;  //Без этого бина все тесты отказываются работать. Для чего-то тестовой БД он нужен!
 
-
     @Autowired
     private FacultyRepository repository;
 
@@ -178,7 +177,7 @@ class FacultyControllerIT {
         var faculties = result.getBody();
         //check:
         Assertions.assertThat(faculties).isNotNull();
-//        Assertions.assertThat(faculties.size()).isEqualTo(7);  //4 факультетов уже имеется в БД, к ним добаляем 3. Лучше эту строку закомментировать, т.к. количество объектов в базе может поменяться
+        Assertions.assertThat(faculties.size()).isEqualTo(3);  //В тест-базе только тестовые объекты
 //        Assertions.assertThat(faculties).contains(new Faculty(5l, "АО", "голубой"));
         Assertions.assertThat(faculties).contains(new Faculty(f1.getId(), "test1", "red"));
 
