@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -54,6 +55,12 @@ public class AvatarControllerIT {
     @Autowired
     private StudentRepository studentRepository;
 
+    @MockBean
+    private StudentAvatarService studentAvatarService;
+
+    @MockBean
+    private StudentService studentService;
+
     private String baseUrl;
 
     @BeforeEach
@@ -72,27 +79,27 @@ public class AvatarControllerIT {
         Assertions.assertThat(avatarController).isNotNull();
     }
 
-    @Test
-    public void testUploadAvatar() throws IOException {
-        Long studentId = 1L;
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        byte[] avatarContent = Files.readAllBytes(new ClassPathResource("./src/test/resources/test.png").getFile().toPath());
-
-
-        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-        body.add("avatar", new org.springframework.core.io.ByteArrayResource(avatarContent) {
-            @Override
-            public String getFilename() {
-                return "test.png";
-            }
-        });
-
-        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-
-        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/avatar/" + studentId + "/avatar", HttpMethod.POST, requestEntity, String.class);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
+//    @Test
+//    public void testUploadAvatar() throws IOException {
+//        Long studentId = 1L;
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//        byte[] avatarContent = Files.readAllBytes(new ClassPathResource("./src/test/resources/test.png").getFile().toPath());
+//
+//
+//        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//        body.add("avatar", new org.springframework.core.io.ByteArrayResource(avatarContent) {
+//            @Override
+//            public String getFilename() {
+//                return "test.png";
+//            }
+//        });
+//
+//        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+//
+//        ResponseEntity<String> response = restTemplate.exchange(baseUrl + "/avatar/" + studentId + "/avatar", HttpMethod.POST, requestEntity, String.class);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//    }
 }

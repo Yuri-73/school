@@ -1,5 +1,7 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -51,6 +53,7 @@ public class Avatar {
         this.mediaType = mediaType;
     }
 
+    @JsonIgnore
     public byte[] getData() {
         return data;
     }  //Массив, куда будет сохранен файл для БД
