@@ -84,5 +84,26 @@ public class StudentController {
     public ResponseEntity<Faculty> getFacultyOfStudent(@PathVariable Long id) {
         return ResponseEntity.ok(studentService.getFacultyOfStudent(id));
     }
+
+    //ДЗ-4.1 шаг 1 Получение общего количества студентов из БД через @Query:
+    @GetMapping("/all-count-students")
+    // в БД (первый метод шага 1 ДЗ-4.1)
+    public Integer getCountAllStudents() {
+        return studentService.getCountAllStudentInSchool();
+    }
+
+    //ДЗ-4.1 шаг 1 Получение среднего возраста всех студентов из БД через @Query:
+    @GetMapping("/midl-age-students")
+    public Integer getMidlAgeStudents() {
+        return studentService.getMidlAgeStudent();
+    }
+
+    //ДЗ-4.1 шаг 1 Получение 5 последних студентов из БД через @Query в обратном порядке:
+    @GetMapping("/last-five-students")
+    public List<Student> getFiveLastBackStudents() {
+        return studentService.getFiveLastBackStudents();
+    }
+
+
 }
 

@@ -79,5 +79,22 @@ public class StudentService {
                 .map(Student::getFaculty)
                 .orElse(null);
     }
+
+    //Методы для SQL-запросов из БД (3 шт.): шаг 1 ДЗ-4.1:
+    public Integer getCountAllStudentInSchool() {
+        return studentRepository.getAllStudentInSchool();
+    }
+
+    public Integer getMidlAgeStudent() {
+        return studentRepository.getMidlAgeStudent();
+    }
+
+    public List<Student> getFiveLastBackStudents() {
+        // в БД в обратном порядке(третий метод шага 1 ДЗ-4.1)
+        return studentRepository.getFiveLastBackStudents();
+    }
+
+
+
 }
 

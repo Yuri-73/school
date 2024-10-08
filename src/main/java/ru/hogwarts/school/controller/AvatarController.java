@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 @RestController
 public class AvatarController {
@@ -57,5 +58,12 @@ public class AvatarController {
             response.setContentLength((int)avatar.getFileSize());
             is.transferTo(os);
         }
+    }
+
+    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+    @GetMapping(value = "/page-avatars")
+    public ResponseEntity<List<Avatar>> getAllAvatar(@RequestParam("page") Integer pageNumber, @RequestParam("size") Integer pageSize) {
+        List<Avatar> avatars = studentAvatarService.getAllAvatars(pageNumber, pageSize);
+        return ResponseEntity.ok(avatars);
     }
 }

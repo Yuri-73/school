@@ -100,9 +100,9 @@ class AvatarServiceTest {
 
         //Тест:
         out.uploadAvatar(studentId, file);
-        Path path1 = Path.of(path + "/" + studentId + ".jpg");
 
         //Контроль:
+        Path path1 = Path.of(path + "/" + studentId + ".jpg");
         assertTrue(Files.isReadable(path1));
 //        assertTrue(Files.exists(path1));   //Можно и так
 
