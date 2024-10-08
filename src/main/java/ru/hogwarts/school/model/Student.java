@@ -2,17 +2,23 @@ package ru.hogwarts.school.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import javax.persistence.*;
 import java.util.Objects;
 
 @Entity
+//@JsonPropertyOrder({"id", "name", "age", "faculty"})
 public class Student {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 //    @Column(columnDefinition = "oid")
     private Long id;
+
+//    @JsonProperty("Name")
     private String name;
+
     private int age;
 
 //    @OneToOne

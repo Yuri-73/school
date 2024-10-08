@@ -67,12 +67,12 @@ public class FacultyController {
 
     // ДЗ-3.2 Сваггер (без репозитория)
     @GetMapping(path = "/get/color")
-    //localhost:8090/faculty/searchColor?color=green
+    //localhost:8090/faculty/get/color?color=green
     String getFacultyByColor(@RequestParam(required = false) String color) {
         try {
             return "Факультеты с таким цветом найдены: " + facultyService.getFacultyByColor(color);
         } catch (NullEmptyColorException exc) {
-            return "Цвет факультета на задан";
+            return "Цвет факультета не задан";
         } catch (NoFacultyColorException exception) {
             return "Факультеты с таким цветом отсутствуют";
         }

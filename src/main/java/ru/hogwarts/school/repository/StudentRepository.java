@@ -13,4 +13,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Student> findByAgeBetween(int min, int max); //Стандартный метод поиска студентов с отрезком нужных возрастов
 
     Collection<Student> findStudentsByFacultyName(String facultyName); //Стандартный метод поиска всех студентов по имени факультета
+
+    public void deleteById(Long id);  //Для очищения интеграционных тестов
 }

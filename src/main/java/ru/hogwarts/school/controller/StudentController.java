@@ -23,7 +23,7 @@ public class StudentController {
     }
 
     @PostMapping // POST http://localhost:8090/student
-    public ResponseEntity<Student> createStudent(@RequestBody Student student) { //Для записи студентов по телу через свагер(постман)
+    public ResponseEntity<Student> createStudent(@RequestBody Student student) { //Для записи студентов по телу запроса через свагер(постман)
         Student student1 = studentService.createStudent(student);
         return ResponseEntity.ok(student1); //В свагере увидим созданный объект в JSON
     }
@@ -59,21 +59,14 @@ public class StudentController {
     }
 
     @GetMapping(path = "/get/by-age")
-        //ДЗ-3.2
-        //localhost:8090/student/searchAge?age=22
-    String getStudentByAge(@RequestParam(required = false) Integer age) {
-        try {
-            return "Студенты с таким возрастом: " + studentService.getStudentByAge(age);
-        } catch (NullAgeException exc) {
-            return "Параметр адреса не задан";
-        } catch (NoStudentAgeException exception) {
-            return "Студентов с таким возрастом в коллекции нет";
-        }
+        //ДЗ-3.2 изначально без репозитория, но теперь работает через getAllStudent()
+    public ResponseEntity<Collection<Student>> getStudentByAge(@RequestParam(required = false) Integer age) {
+            return ResponseEntity.ok(studentService.getStudentByAge(age));
     }
 
     // ДЗ-3.4, шаг 1.1
     @GetMapping("/age") // GET http://localhost:8090/student/age?min=22&max=23
-    public ResponseEntity<List<Student>> findByAgeStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
+    public ResponseEntity<List<Student>> findByAgeBetweenStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
         if (studentService.findByAgeBetween(min, max).isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1;
         }
@@ -81,7 +74,7 @@ public class StudentController {
     }
 
     //ДЗ-3.4, шаг 4.2*(по имени факультета - по своей инициативе, в условии нет; не через геттер students'а в faculty, а через функционал БД:
-    @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?faculty_id=АО
+    @GetMapping("/faculty") // GET http://localhost:8082/student/faculty?facultyName=АО
     public ResponseEntity<Collection<Student>> findStudentsByFacultyName(String facultyName) {
         return ResponseEntity.ok(studentService.findStudentsByFacultyName(facultyName));
     }
