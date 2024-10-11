@@ -1,19 +1,27 @@
 package ru.hogwarts.school.controller.webMvcTest;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import ru.hogwarts.school.controller.AvatarController;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
@@ -22,15 +30,25 @@ import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentAvatarService;
 import ru.hogwarts.school.service.StudentService;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.web.servlet.function.RequestPredicates.accept;
 
 @WebMvcTest(AvatarController.class)
+//@SpringBootTest
+//@AutoConfigureMockMvc
 public class AvatarControllerWebMvcTest {
     @Autowired
     private MockMvc mockMvc;
@@ -52,8 +70,98 @@ public class AvatarControllerWebMvcTest {
 
 //    private ObjectMapper mapper = new ObjectMapper();
 
+    //ДЗ-3.6(1)
     @Test
-    public void getAllAvatarTest() throws Exception {
+    void uploadAvatarTest() throws Exception {
+        Student student = new Student(1L, "Nikolay", 30);
+        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
+        Avatar avatar = new Avatar();
+        avatar.setData(bytes);
+        avatar.setFilePath("/1L.pdf");
+        avatar.setFileSize(11L);
+        avatar.setStudent(student);
+        avatar.setMediaType(".pdf");
+
+        when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
+        when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
+        when(studentAvatarRepository.save(ArgumentMatchers.any(Avatar.class))).thenReturn(avatar);
+
+        File file = new File("src\\test\\resources\\test.jpg");
+        String name = file.getName();
+
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("avat", name, MediaType.MULTIPART_FORM_DATA_VALUE, bytes);
+
+        MvcResult mvcResult = mockMvc.perform(multipart("/" + student.getId() + "/avatar")
+                        .file(mockMultipartFile))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String jsonResponse = mvcResult.getResponse().getContentAsString();
+        System.out.println("!!!");
+        System.out.println(jsonResponse);
+
+        assertNotNull(avatar);
+        System.out.println(avatar.getFilePath());
+        assertEquals(avatar.getFilePath(), "avatars\\1.jpg");
+        assertEquals(avatar.getStudent(), student);
+        assertEquals(avatar.getFileSize(), bytes.length);
+    }
+
+    //ДЗ-3.6(2)
+    @Test
+    void downloadAvatarFromDatabaseTest() throws Exception {  //Тест проходит, но проверить вывод массива байт не могу
+        Student student = new Student(1L, "Nikolay", 30);
+        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
+
+        Avatar avatar = new Avatar();
+        avatar.setData(bytes);
+        avatar.setFilePath("/test.jpg"); //Полный путь необязателен, т.к. он не нужен для поиска аватара в БД
+        avatar.setFileSize(11L);
+        avatar.setStudent(student);
+        avatar.setMediaType("image/jpg");
+
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
+        when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
+
+        var result = mockMvc.perform(MockMvcRequestBuilders
+                        .get("/" + student.getId() + "/avatar/preview")
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                //check:
+                .andExpect(status().isOk())
+//                .andExpect(content().bytes(result.getResponse().getContentAsByteArray()))
+                .andReturn();
+//        assertEquals(bytes, result.getResponse().getContentAsByteArray());
+    }
+
+    //ДЗ-3.6(3)
+    @Test
+    void downloadAvatarFromFileTest() throws Exception {
+        Student student = new Student(1L, "Nikolay", 30);
+        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
+        Avatar avatar = new Avatar();
+        avatar.setData(bytes);
+        avatar.setFilePath("src/test/resources/test.jpg"); //Полный путь обязательно!!!
+        avatar.setFileSize(11L);
+        avatar.setStudent(student);
+        avatar.setMediaType("image/jpg");
+
+        when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
+        when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/" + student.getId() + "/avatar")
+                        .accept(MediaType.APPLICATION_OCTET_STREAM))
+                //check:
+                .andExpect(status().isOk())
+                .andReturn();
+    }
+    //ДЗ-4.1(page)
+    @Test
+    public void getAllAvatarPageTest() throws Exception {
         //Начальные условия:
         Integer pageNumber = 1;
         Integer pageSize = 1;
@@ -80,10 +188,10 @@ public class AvatarControllerWebMvcTest {
 
         //Тест:
         mockMvc.perform(MockMvcRequestBuilders
-                .get("/page-avatars/")
-                .param("page", "" + pageNumber)
-                .param("size", "" + pageSize)
-                .accept(MediaType.APPLICATION_JSON))
+                        .get("/page-avatars/")
+                        .param("page", "" + pageNumber)
+                        .param("size", "" + pageSize)
+                        .accept(MediaType.APPLICATION_JSON))
                 //Контроль:
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -95,7 +203,5 @@ public class AvatarControllerWebMvcTest {
                 .andExpect(jsonPath("$[0].student.id").value(1l))
                 .andExpect(jsonPath("$[1].student.id").value(2l))
         ;
-
-
     }
 }
