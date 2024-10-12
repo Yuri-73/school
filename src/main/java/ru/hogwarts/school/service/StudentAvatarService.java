@@ -92,7 +92,7 @@ public class StudentAvatarService {
     } //Определение формата расширения файла
 
     // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
-    public List<Avatar> getAllAvatars(Integer pageNumber, Integer pageSize) {
+    public List<Avatar> getAllAvatarsPage(Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return studentAvatarRepository.findAll(pageRequest).getContent();
     }

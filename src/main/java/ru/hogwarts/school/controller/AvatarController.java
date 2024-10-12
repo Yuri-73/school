@@ -1,5 +1,6 @@
 package ru.hogwarts.school.controller;
 
+import net.bytebuddy.pool.TypePool;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -16,6 +17,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
+import static java.util.Collections.emptyList;
 
 @RestController
 public class AvatarController {
@@ -55,15 +58,19 @@ public class AvatarController {
              // Выходной поток уже был создан, поэтому не через new, а через геттер:
              OutputStream os = response.getOutputStream()) {
             response.setContentType(avatar.getMediaType()); // Оба заголовка. Вернем тот же MediaType, который был сохранён в БД.
-            response.setContentLength((int)avatar.getFileSize());
+            response.setContentLength((int) avatar.getFileSize());
             is.transferTo(os);
         }
     }
 
     // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
     @GetMapping(value = "/page-avatars")
-    public ResponseEntity<List<Avatar>> getAllAvatar(@RequestParam("page") Integer pageNumber, @RequestParam("size") Integer pageSize) {
-        List<Avatar> avatars = studentAvatarService.getAllAvatars(pageNumber, pageSize);
-        return ResponseEntity.ok(avatars);
+    public ResponseEntity<List<Avatar>> getAllAvatarsPage(@RequestParam(value = "page", required = false, defaultValue = "1") Integer pageNumber,
+                                                          @RequestParam(value = "size", required = false, defaultValue = "10") Integer pageSize) {
+        if (pageNumber >= 1 && pageSize > 0) {
+            List<Avatar> avatars = studentAvatarService.getAllAvatarsPage(pageNumber, pageSize);
+            return ResponseEntity.ok(avatars);
+        }
+        return ResponseEntity.ok(emptyList());
     }
 }

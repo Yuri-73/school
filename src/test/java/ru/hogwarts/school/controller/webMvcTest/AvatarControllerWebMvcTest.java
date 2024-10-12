@@ -159,9 +159,9 @@ public class AvatarControllerWebMvcTest {
                 .andExpect(status().isOk())
                 .andReturn();
     }
-    //ДЗ-4.1(page)
+    //ДЗ-4.1(page валидное)
     @Test
-    public void getAllAvatarPageTest() throws Exception {
+    public void shouldGetAllAvatarsPage_WhenValidParams_ThenReturnList() throws Exception {
         //Начальные условия:
         Integer pageNumber = 1;
         Integer pageSize = 1;
@@ -203,5 +203,24 @@ public class AvatarControllerWebMvcTest {
                 .andExpect(jsonPath("$[0].student.id").value(1l))
                 .andExpect(jsonPath("$[1].student.id").value(2l))
         ;
+    }
+
+    //ДЗ-4.1(недопустимые параметры на входе)
+    @Test
+    public void shouldGetAllAvatarsPage_WhenAnyInvalidParam_ThenReturnEmptyList() throws Exception {
+        //Начальные условия:
+        Integer pageNumber = 0;
+        Integer pageSize = 0;
+
+        //Тест:
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get("/page-avatars/")
+                        .param("page", "" + pageNumber)
+                        .param("size", "" + pageSize)
+                        .accept(MediaType.APPLICATION_JSON))
+                //Контроль:
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.size()").value(0));
     }
 }
