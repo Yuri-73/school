@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -73,6 +74,7 @@ public class AvatarControllerWebMvcTest {
     //ДЗ-3.6(1)
     @Test
     void uploadAvatarTest() throws Exception {
+        //входные условия:
         Student student = new Student(1L, "Nikolay", 30);
         byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
         Avatar avatar = new Avatar();
@@ -91,16 +93,19 @@ public class AvatarControllerWebMvcTest {
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("avat", name, MediaType.MULTIPART_FORM_DATA_VALUE, bytes);
 
+        //тест:
         MvcResult mvcResult = mockMvc.perform(multipart("/" + student.getId() + "/avatar")
                         .file(mockMultipartFile))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andReturn();
 
+        //?
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         System.out.println("!!!");
-        System.out.println(jsonResponse);
+        System.out.println("jsonResponse" + jsonResponse);
 
+        //контроль:
         assertNotNull(avatar);
         System.out.println(avatar.getFilePath());
         assertEquals(avatar.getFilePath(), "avatars\\1.jpg");
@@ -111,6 +116,7 @@ public class AvatarControllerWebMvcTest {
     //ДЗ-3.6(2)
     @Test
     void downloadAvatarFromDatabaseTest() throws Exception {  //Тест проходит, но проверить вывод массива байт не могу
+        //входные условия:
         Student student = new Student(1L, "Nikolay", 30);
         byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
 
@@ -121,25 +127,24 @@ public class AvatarControllerWebMvcTest {
         avatar.setStudent(student);
         avatar.setMediaType("image/jpg");
 
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
         when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
         when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
 
+        //тест:
         var result = mockMvc.perform(MockMvcRequestBuilders
                         .get("/" + student.getId() + "/avatar/preview")
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
-                //check:
+                //контроль:
                 .andExpect(status().isOk())
-//                .andExpect(content().bytes(result.getResponse().getContentAsByteArray()))
                 .andReturn();
-//        assertEquals(bytes, result.getResponse().getContentAsByteArray());
+        //Сравнение массива байт в начальном условии с выходным массивом байт:
+        assertArrayEquals(bytes, result.getResponse().getContentAsByteArray());
     }
 
     //ДЗ-3.6(3)
     @Test
     void downloadAvatarFromFileTest() throws Exception {
+        //входные условия:
         Student student = new Student(1L, "Nikolay", 30);
         byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
         Avatar avatar = new Avatar();
@@ -152,17 +157,20 @@ public class AvatarControllerWebMvcTest {
         when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
         when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
 
+        //тест:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/" + student.getId() + "/avatar")
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
-                //check:
+                //контроль:
+                .andExpectAll()
                 .andExpect(status().isOk())
                 .andReturn();
     }
-    //ДЗ-4.1(page валидное)
+
+    //ДЗ-4.1(page с валидными параметрами)
     @Test
     public void shouldGetAllAvatarsPage_WhenValidParams_ThenReturnList() throws Exception {
-        //Начальные условия:
+        //входные условия:
         Integer pageNumber = 1;
         Integer pageSize = 1;
 
@@ -184,15 +192,17 @@ public class AvatarControllerWebMvcTest {
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         List<Avatar> list = List.of(avatar, avatar2);
         Page<Avatar> avatarPage = new PageImpl<>(list, pageable, 0);
+
         when(studentAvatarRepository.findAll(pageable)).thenReturn(avatarPage);
 
-        //Тест:
+        //тест:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/page-avatars/")
                         .param("page", "" + pageNumber)
                         .param("size", "" + pageSize)
                         .accept(MediaType.APPLICATION_JSON))
                 //Контроль:
+                .andExpectAll()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.size()").value(2))
@@ -201,26 +211,27 @@ public class AvatarControllerWebMvcTest {
                 .andExpect(jsonPath("$[0].filePath").value("/1L.pdf"))
                 .andExpect(jsonPath("$[1].filePath").value("/2L.pdf"))
                 .andExpect(jsonPath("$[0].student.id").value(1l))
-                .andExpect(jsonPath("$[1].student.id").value(2l))
-        ;
+                .andExpect(jsonPath("$[1].student.id").value(2l));
     }
 
     //ДЗ-4.1(недопустимые параметры на входе)
     @Test
     public void shouldGetAllAvatarsPage_WhenAnyInvalidParam_ThenReturnEmptyList() throws Exception {
-        //Начальные условия:
+        //входные условия:
         Integer pageNumber = 0;
         Integer pageSize = 0;
 
-        //Тест:
+        //тест:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/page-avatars/")
                         .param("page", "" + pageNumber)
                         .param("size", "" + pageSize)
                         .accept(MediaType.APPLICATION_JSON))
-                //Контроль:
+                //контроль:
+                .andExpectAll()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.size()").value(0));
+                .andExpect(jsonPath("$.size()").value(0))
+                .andReturn();
     }
 }
