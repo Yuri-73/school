@@ -214,40 +214,4 @@ class StudentServiceTest {
         //check:
         assertEquals(out.getFacultyOfStudent(anyLong()), null);
     }
-
-    @Test
-    void createStudent() {
-    }
-
-    @Test
-    void findStudent() {
-    }
-
-    @Test
-    void editStudent() {
-    }
-
-    @Test
-    void deleteStudent() {
-    }
-
-    @Test
-    void getAllStudent() {
-    }
-
-    @Test
-    void getStudentByAge() {
-    }
-
-    @Test
-    void findByAgeBetween() {
-    }
-
-    @Test
-    void findStudentsByFacultyName() {
-    }
-
-    @Test
-    void getFacultyOfStudent() {
-    }
 }
