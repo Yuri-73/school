@@ -24,7 +24,7 @@ import java.util.Collection;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class StudentControllerIT {
+class StudentControllerIntegro {
     @LocalServerPort
     private int port;
 
@@ -311,5 +311,87 @@ class StudentControllerIT {
         f.setName(name);
         f.setColor(color);
         return f;
+    }
+
+    //ДЗ-4.1(1) (@Query)
+    @Test
+    public void getCountAllStudentsTest() {  //Тест на получениеобщего количества студентов
+        //initial data:
+        Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
+        Student s1 = student("Пётр", 44);
+        s1.setFaculty(f);
+        Student s2 = student("Борис", 46);
+        s2.setFaculty(f);
+        Student s3 = student("Павел", 48);
+        s3.setFaculty(f);
+        //test:
+        Student saved1 = restTemplate.postForObject("/student", s1, Student.class);
+        Student saved2 = restTemplate.postForObject("/student", s2, Student.class);
+        Student saved3 = restTemplate.postForObject("/student", s3, Student.class);
+
+        var result = restTemplate.getForObject("/student/all-count-students", Integer.class);
+        //check:
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(3);
+    }
+
+    //ДЗ-4.1(2) (@Query)
+    @Test
+    public void getMidlAgeStudentsTest() {  //Тест на получение среднего возраста студентов
+        //initial data:
+        Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
+        Student s1 = student("Пётр", 44);
+        s1.setFaculty(f);
+        Student s2 = student("Борис", 46);
+        s2.setFaculty(f);
+        Student s3 = student("Павел", 48);
+        s3.setFaculty(f);
+        int midlAge = (s1.getAge() + s2.getAge() + s3.getAge()) / 3;
+        //test:
+        Student saved1 = restTemplate.postForObject("/student", s1, Student.class);
+        Student saved2 = restTemplate.postForObject("/student", s2, Student.class);
+        Student saved3 = restTemplate.postForObject("/student", s3, Student.class);
+
+        var result = restTemplate.getForObject("/student/midl-age-students", Integer.class);
+        //check:
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(midlAge);
+    }
+
+    //ДЗ-4.1(3) (@Query)
+    @Test
+    public void getFiveLastBackStudentsTest() {  //Тест на получение 5 последних студентов
+        //initial data:
+        Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
+        Student s1 = student("Пётр", 44);
+        s1.setFaculty(f);
+        Student s2 = student("Борис", 46);
+        s2.setFaculty(f);
+        Student s3 = student("Павел", 48);
+        s3.setFaculty(f);
+
+        Student s4 = student("Пётр2", 49);
+        s1.setFaculty(f);
+        Student s5 = student("Борис2", 41);
+        s2.setFaculty(f);
+        Student s6 = student("Павел2", 42);
+        s3.setFaculty(f);
+
+        //test:
+        Student saved1 = restTemplate.postForObject("/student", s1, Student.class);
+        Student saved2 = restTemplate.postForObject("/student", s2, Student.class);
+        Student saved3 = restTemplate.postForObject("/student", s3, Student.class);
+        Student saved4 = restTemplate.postForObject("/student", s4, Student.class);
+        Student saved5 = restTemplate.postForObject("/student", s5, Student.class);
+        Student saved6 = restTemplate.postForObject("/student", s6, Student.class);
+
+        ResponseEntity<Collection<Student>> result = restTemplate.exchange("/student/last-five-students",
+                HttpMethod.GET, null, new ParameterizedTypeReference<Collection<Student>>() {
+                });
+        var students = result.getBody();
+        //check:
+        Assertions.assertThat(students).isNotNull();
+        Assertions.assertThat(students.size()).isEqualTo(5);
+        Assertions.assertThat(students).containsExactly(saved6, saved5, saved4, saved3, saved2);
     }
 }

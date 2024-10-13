@@ -1,6 +1,7 @@
 package ru.hogwarts.school.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.exception.StudentNotFoundException;
@@ -16,6 +17,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -23,13 +25,13 @@ import static java.nio.file.StandardOpenOption.CREATE_NEW;
 @Transactional
 public class StudentAvatarService {
 
-//    @Value("${students.avatar.dir.path}") //Путь, где будет храниться наша картинка.
+    //    @Value("${students.avatar.dir.path}") //Путь, где будет храниться наша картинка.
     private String avatarsDir;
 
     private final StudentService studentService;
     private final StudentAvatarRepository studentAvatarRepository;
 
-    public StudentAvatarService(StudentService studentService, StudentAvatarRepository studentAvatarRepository, @Value("${students.avatar.dir.path}") String avatarsDir)  {
+    public StudentAvatarService(StudentService studentService, StudentAvatarRepository studentAvatarRepository, @Value("${students.avatar.dir.path}") String avatarsDir) {
         this.studentService = studentService;
         this.studentAvatarRepository = studentAvatarRepository;
         this.avatarsDir = avatarsDir;
@@ -57,7 +59,7 @@ public class StudentAvatarService {
         avatar.setFileSize(file.getSize()); // Указываем его размер
         avatar.setMediaType(file.getContentType()); // Указываем его контент
         avatar.setData(generateImagePreview(filePath)); // Создаём маленькую картинку, который с помощью метода generateImagePreview() уменьшает размер картинки,
-//        avatar.setData(file.getBytes()); Вот если вместо верхней строки вставить эту, тест на данный метод пройдёт, но почему-то пропадут картинки в файловой системе!
+//        avatar.setData(file.getBytes()); //Вот если вместо верхней строки вставить эту, тест на данный метод пройдёт, но почему-то пропадут картинки в файловой системе!
         //и ложим в массив байтов для БД.
 
         studentAvatarRepository.save(avatar); // Сохраняем этот объект в БД. Фактически будет сохранен массив байтов, а все остальные переменные объекта создавались для размещения на диске.
@@ -88,4 +90,10 @@ public class StudentAvatarService {
     private String getExtension(String filename) {
         return filename.substring(filename.lastIndexOf(".") + 1);
     } //Определение формата расширения файла
+
+    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+    public List<Avatar> getAllAvatarsPage(Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
+        return studentAvatarRepository.findAll(pageRequest).getContent();
+    }
 }

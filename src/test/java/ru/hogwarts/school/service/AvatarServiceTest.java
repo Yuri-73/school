@@ -29,13 +29,14 @@ class AvatarServiceTest {
     private StudentService studentService = mock(StudentService.class);
     private final String path = "./src/test/resources";
     private StudentAvatarService out;
-    byte[] image;
+    byte[] image; //Этот массив байт инициализируется через поток в конструкторе
+//    byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg")); //Этот массив байт тоже можно применить. Он инициализируется через Path.
     private final Student studentDto = new Student(1L, "Harry", 11);
 
     public AvatarServiceTest() throws IOException {
         out = new StudentAvatarService(studentService, studentAvatarRepository, path);  //Теперь path  в конструкторе, чтобы был тестовый путь
 
-        try (InputStream is = Files.newInputStream(Path.of(path + "/test.jpg"));  //сканируем из файла
+        try (InputStream is = Files.newInputStream(Path.of(path + "/test.jpg"));  //открываем поток из файла, нах-ся в директории теста проекта
              BufferedInputStream bis = new BufferedInputStream(is, 1024);
              ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ) {
@@ -100,9 +101,9 @@ class AvatarServiceTest {
 
         //Тест:
         out.uploadAvatar(studentId, file);
-        Path path1 = Path.of(path + "/" + studentId + ".jpg");
 
         //Контроль:
+        Path path1 = Path.of(path + "/" + studentId + ".jpg");
         assertTrue(Files.isReadable(path1));
 //        assertTrue(Files.exists(path1));   //Можно и так
 
