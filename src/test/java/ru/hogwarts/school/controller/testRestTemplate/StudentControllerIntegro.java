@@ -1,5 +1,6 @@
 package ru.hogwarts.school.controller.testRestTemplate;
 
+import net.bytebuddy.description.field.FieldList;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,10 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.controller.StudentController;
+import ru.hogwarts.school.exception.NullAgeException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
@@ -20,7 +24,10 @@ import ru.hogwarts.school.service.StudentAvatarService;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
 
+import static ch.qos.logback.core.util.AggregationType.NOT_FOUND;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -394,4 +401,87 @@ class StudentControllerIntegro {
         Assertions.assertThat(students.size()).isEqualTo(5);
         Assertions.assertThat(students).containsExactly(saved6, saved5, saved4, saved3, saved2);
     }
+
+
+    //Тесты к ДЗ-4.5 Параллельные стримы:
+    @Test
+    public void getAllNameStartsWithATest() { //Тест на получение коллекции имён на первую букву имени в большом регистре
+        //initial data:
+        var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
+        var s2 = restTemplate.postForObject("/student", student("r2", 17), Student.class);
+        var s3 = restTemplate.postForObject("/student", student("r3", 18), Student.class);
+        var s4 = restTemplate.postForObject("/student", student("r4", 19), Student.class);
+        var s5 = restTemplate.postForObject("/student", student("s5", 18), Student.class);
+        //test:
+        ResponseEntity<Collection<String>> result = restTemplate.exchange("/student/all-starts-name/r",
+                HttpMethod.GET, null, new ParameterizedTypeReference<Collection<String>>() {
+                });
+        var students = result.getBody(); //Выуживание коллекции students из ResponseEntity
+        //check:
+        Assertions.assertThat(students).isNotNull();
+        Assertions.assertThat(students.size()).isEqualTo(3);
+        Assertions.assertThat(students).containsExactly("R2", "R3", "R4");
+    }
+
+    @Test
+    public void getAllNameStartsWithA_NotFound_Test() { //Тест на получение коллекции имён на отсутствующую букву в имени
+        //initial data:
+        var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
+        var s2 = restTemplate.postForObject("/student", student("r2", 17), Student.class);
+        var s3 = restTemplate.postForObject("/student", student("r3", 18), Student.class);
+        var s4 = restTemplate.postForObject("/student", student("r4", 19), Student.class);
+        var s5 = restTemplate.postForObject("/student", student("s5", 18), Student.class);
+        //test:
+        ResponseEntity<Collection<String>> result = restTemplate.exchange("/student/all-starts-name/k",
+                HttpMethod.GET, null, new ParameterizedTypeReference<Collection<String>>() {
+                });
+        System.out.println("result: " +result);
+        var students = result.getBody(); //Выуживание коллекции students из ResponseEntity
+        //check:
+        Assertions.assertThat(students).isNull();
+        Assertions.assertThat(result.getStatusCode().toString()).isEqualTo("404 NOT_FOUND");
+    }
+
+    @Test
+    public void getMidlAgeAllStudentsTest() {  //Тест на получение среднего возраста введённых студентов
+        //initial data:
+        var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
+        var s2 = restTemplate.postForObject("/student", student("r2", 17), Student.class);
+        var s3 = restTemplate.postForObject("/student", student("r3", 28), Student.class);
+        var s4 = restTemplate.postForObject("/student", student("r4", 19), Student.class);
+        var s5 = restTemplate.postForObject("/student", student("s5", 38), Student.class);
+
+        var count = (s1.getAge() + s2.getAge() + s3.getAge() + s4.getAge() + s5.getAge()) / 5;
+        //test:
+        var result = restTemplate.getForObject("/student/average/age", Integer.class);
+        System.out.println("result: " +result);
+        //check:
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(count);
+    }
+
+    @Test
+    public void getMidlAgeAllStudents_Zero_Test() {  //Тест на получение нулевого среднего возраста
+        //test:
+        var result = restTemplate.getForObject("/student/average/age", Integer.class);
+        System.out.println("result: " +result);
+        //check:
+        Assertions.assertThat(result).isZero();
+        Assertions.assertThat(result).isEqualTo(0);
+    }
+
+    @Test
+    public void getSumStreamParallelTest() {
+        //initial data:
+        Integer summary = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .reduce(0, Integer::sum);
+        //test:
+        var result = restTemplate.getForObject("/student/sum-parallel", Integer.class);
+        //check:
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(summary);
+    }
 }
+
+

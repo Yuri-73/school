@@ -102,5 +102,26 @@ public class FacultyController {
     public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
         return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
     }
+
+    //ДЗ-4.5 (только шаг 3, остальные шаги в классе-сервисе студента)
+    //Вывод самого длинного имени факультета в БД факультета с помощью стрима:
+    @GetMapping("/long-name")
+    public ResponseEntity<String> longestNameFaculty() {
+        String name = facultyService.longestFacultyName();
+        if ((name.isEmpty())) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(name);
+    }
+
+    //Вывод самого длинного цвета факультета в БД факультета с помощью стрима (дополнительный метод):
+    @GetMapping("/long-color")
+    public ResponseEntity<String> longestColorFaculty() {
+        String color = facultyService.longestFacultyColor();
+        if ((color.isEmpty())) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(color);
+    }
 }
 
