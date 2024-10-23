@@ -15,6 +15,7 @@ import ru.hogwarts.school.repository.StudentRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class StudentService {
@@ -113,6 +114,60 @@ public class StudentService {
         logger.info("Method getFiveLastBackStudents started");
         // в БД в обратном порядке(третий метод шага 1 ДЗ-4.1)
         return studentRepository.getFiveLastBackStudents();
+    }
+
+    //ДЗ-4.5
+    //Шаг 1. Вывод всех имён студентов, начинающихся с одной и той же буквы,
+    // а также отсортированных в алфавитном порядке и находящихся в верхнем регистре:
+    public List<String> getAllNameStartsWithLetter(String letter) {
+        System.out.println("letter: " + letter);
+        return studentRepository.findAll()
+                .stream()  //Переводим нашу коллекцию студентов в Stream, чтобы через него
+                // добавлять специальные функциональные методы
+                .map(Student::getName) //Мап-метод создания коллекции String из коллекции Student
+                .filter(e -> e.startsWith(letter)) //Фильтруем по первой букве слова в коллекции
+                .map(String::toUpperCase)//Переводим отфильтрованные на одинаковую букву слова в верхний регистр
+                .sorted()//Сортируем имена по алфавиту (наверное, по второй букве, т.к. первая буква одинаковая)
+                .collect(Collectors.toList()); //Терминальная функция собирания имён в коллекцию
+    }
+
+    //Шаг 2. Вывод среднего возраста всех студентов, находящихся в БД студентов:
+    public Integer getMidlAgeAllStudents() {
+        double average = studentRepository.findAll()
+                .stream()  //Переводим нашу коллекцию студентов в Stream, чтобы через него
+                // добавлять специальные функциональные методы
+                .mapToInt(Student::getAge)  //Мап-метод создания коллекции Integer из коллекции Student
+                .average() //Ищем среднее значение коллекции с типом данных Integer
+                .orElse(0.0);  //Если в созданной коллекция Integer пустая, то возвращается 0.0
+        return (int) average;
+    }
+
+    //Шаг 4. Вывод целого числа, полученного суммой всех значений от 1 до 1000 с помощью параллельного стрима:
+    public Integer getIntegerParallelStream() {
+        //Проверка времени сумирования с использованием метода parallel():
+        long start = System.currentTimeMillis();
+        Integer result = Stream.iterate(1, a -> a + 1) //Объявляем итератор стрима
+                .limit(1000000)  //Ограничиваем число до 1000 включительно. Начиная с 1 прибавляем по 1.
+                .parallel() //Распараллеливаем потоки в пулле
+                .reduce(0, Integer::sum); //Суммируем собранные потоки в конце
+        System.out.println("Время суммирования с использованием параллельных стримов составило: " + (System.currentTimeMillis() - start) + " мс");
+
+        //Проверка времени сумирования без использования метода parallel(), но со стримом:
+        start = System.currentTimeMillis();
+        Integer result2 = Stream.iterate(1, a -> a + 1) //Объявляем итератор стрима
+                .limit(1000000)  //Ограничиваем число до 1000 включительно. Начиная с 1 прибавляем по 1.
+                .reduce(0, Integer::sum); //Суммируем собранные потоки в конце
+        System.out.println("Время суммирования без использования параллельных стримов составило: " + (System.currentTimeMillis() - start) + " мс");
+
+        //Проверка времени сумирования без использования стрима вообще:
+        start = System.currentTimeMillis();
+        int totalCount = 0;
+        for (int i = 0; i <= 1000000; i++) {
+            totalCount += i;
+        }
+        System.out.println("Время суммирования без использования стрима составило: " + (System.currentTimeMillis() - start) + " мс");
+
+        return result;
     }
 }
 

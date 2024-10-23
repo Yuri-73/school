@@ -105,5 +105,29 @@ public class StudentController {
     }
 
 
+    //ДЗ-4.5: Параллельные стримы
+    //Шаг 1. Вывод всех имён студентов, начинающихся с одной и той же буквы,
+    // а также отсортированных в алфавитном порядке и находящихся в верхнем регистре:
+    @GetMapping("/all-starts-name/{letter}")
+    public ResponseEntity<List<String>> getAllNameStartsWithA(@PathVariable String letter) {
+        List<String> allNameStartsWithLetter = studentService.getAllNameStartsWithLetter(letter);
+        if (allNameStartsWithLetter.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        System.out.println("letter: " + letter);
+        return ResponseEntity.ok(allNameStartsWithLetter);
+    }
+
+    //Шаг 2. Вывод среднего возраста всех студентов, находящихся в БД студентов:
+    @GetMapping("/average/age")
+    public Integer getMidlAgeAllStudents() {
+        return studentService.getMidlAgeAllStudents();
+    }
+
+    //Шаг 4. Вывод целого числа, полученного суммой всех индексов итерации от 1 до 1000000 с помощью параллельного стрима:
+    @GetMapping("/sum-parallel")
+    public Integer getSumStreamParallel() {
+        return studentService.getIntegerParallelStream();
+    }
 }
 

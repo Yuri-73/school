@@ -9,6 +9,7 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.web.bind.annotation.GetMapping;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
@@ -25,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 //Добавил решение от Ильи с вебинара для теста getAllFacultiesTest() с помощью массива JSON
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FacultyControllerIntegro {
-
     @LocalServerPort
     private int port;
 
@@ -297,5 +297,65 @@ class FacultyControllerIntegro {
                 HttpMethod.GET, null, Faculty.class);  //Почему работает только с Id?
         //check:
         assertThat(resultAfterDelete.getStatusCodeValue()).isEqualTo(404);
+    }
+
+    //Тесты для ДЗ-4.5 Параллельные стримы (4 тест-метода):
+    @Test
+    public void longestNameFacultyTest() throws Exception {
+        //initial data:
+        var f = faculty("faculty-name", "color1");
+        var f2 = faculty("fac", "color222");
+        var f3 = faculty("f", "color-name");
+        var saved = restTemplate.postForObject("/faculty", f, Faculty.class);
+        var saved2 = restTemplate.postForObject("/faculty", f2, Faculty.class);
+        var saved3 = restTemplate.postForObject("/faculty", f3, Faculty.class);
+        //test:
+        var result = restTemplate.getForObject("/faculty/long-name", String.class);
+        //check:
+        Assertions
+                .assertThat(result).isNotNull()
+                .isEqualTo("faculty-name");
+    }
+
+    @Test
+    public void longestNameFaculty_EmptyName_Test() throws Exception {
+        //test:
+        ResponseEntity<String> result = restTemplate.exchange("/faculty/long-name",
+                HttpMethod.GET, null, String.class);
+        var longestName = result.getBody();
+        //check:
+        Assertions
+                .assertThat(longestName).isNull();
+        Assertions.assertThat(result.getStatusCode().toString()).isEqualTo("404 NOT_FOUND");
+    }
+
+    @Test
+    public void longestColorFaculty_Test() throws Exception {
+        //initial data:
+        var f = faculty("faculty-name", "color1");
+        var f2 = faculty("fac", "color222");
+        var f3 = faculty("f", "color-name");
+        var saved = restTemplate.postForObject("/faculty", f, Faculty.class);
+        var saved2 = restTemplate.postForObject("/faculty", f2, Faculty.class);
+        var saved3 = restTemplate.postForObject("/faculty", f3, Faculty.class);
+
+        //test:
+        var result = restTemplate.getForObject("/faculty/long-color", String.class);
+        //check:
+        Assertions
+                .assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo("color-name");
+    }
+
+    @Test
+    public void longestColorFaculty_EmptyColor_Test() throws Exception {
+        //test:
+        ResponseEntity<String> result = restTemplate.exchange("/faculty/long-color",
+                HttpMethod.GET, null, String.class);
+        var longestColor = result.getBody();
+        //check:
+        Assertions
+                .assertThat(longestColor).isNull();
+        Assertions.assertThat(result.getStatusCode().toString()).isEqualTo("404 NOT_FOUND");
     }
 }
