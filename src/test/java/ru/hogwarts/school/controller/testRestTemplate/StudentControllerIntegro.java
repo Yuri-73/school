@@ -405,7 +405,7 @@ class StudentControllerIntegro {
 
     //Тесты к ДЗ-4.5 Параллельные стримы:
     @Test
-    public void getAllNameStartsWithATest() { //Тест на получение коллекции имён на первую букву имени в большом регистре
+    public void getAllNameStartsWithATest() { //Тест на получение коллекции имён на первую букву имени в верхнем регистре
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
         var s2 = restTemplate.postForObject("/student", student("r2", 17), Student.class);

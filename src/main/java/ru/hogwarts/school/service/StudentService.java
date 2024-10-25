@@ -123,6 +123,7 @@ public class StudentService {
     // а также отсортированных в алфавитном порядке и находящихся в верхнем регистре:
     public List<String> getAllNameStartsWithLetter(String letter) {
         System.out.println("letter: " + letter);
+        logger.info("Метод getAllNameStartsWithLetter() - Вывод всех имён студентов, начинающихся с одной и той же буквы {}", letter);
         return studentRepository.findAll()
                 .stream()  //Переводим нашу коллекцию студентов в Stream, чтобы через него
                 // добавлять специальные функциональные методы
@@ -135,6 +136,7 @@ public class StudentService {
 
     //Шаг 2. Вывод среднего возраста всех студентов, находящихся в БД студентов:
     public Integer getMidlAgeAllStudents() {
+        logger.info("Метод getMidlAgeAllStudents() - Вывод среднего возраста всех студентов, находящихся в БД студентов:");
         double average = studentRepository.findAll()
                 .stream()  //Переводим нашу коллекцию студентов в Stream, чтобы через него
                 // добавлять специальные функциональные методы
@@ -148,26 +150,32 @@ public class StudentService {
     public Integer getIntegerParallelStream() {
         //Проверка времени сумирования с использованием метода parallel():
         long start = System.currentTimeMillis();
+        logger.info("getIntegerParallelStream() с использованием параллельных стримов:");
         Integer result = Stream.iterate(1, a -> a + 1) //Объявляем итератор стрима
                 .limit(1000000)  //Ограничиваем число до 1000 включительно. Начиная с 1 прибавляем по 1.
                 .parallel() //Распараллеливаем потоки в пулле
                 .reduce(0, Integer::sum); //Суммируем собранные потоки в конце
-        System.out.println("Время суммирования с использованием параллельных стримов составило: " + (System.currentTimeMillis() - start) + " мс");
+        logger.info("Время выполнения с использованием параллельных стримов составило: {}", System.currentTimeMillis() - start);
+        System.out.println("Время суммирования с использованием параллельных стримов составило: " + (System.currentTimeMillis() - start) + " мс"); //И так можно
 
         //Проверка времени сумирования без использования метода parallel(), но со стримом:
         start = System.currentTimeMillis();
+        logger.info("getIntegerParallelStream() без использования метода parallel():");
         Integer result2 = Stream.iterate(1, a -> a + 1) //Объявляем итератор стрима
                 .limit(1000000)  //Ограничиваем число до 1000 включительно. Начиная с 1 прибавляем по 1.
                 .reduce(0, Integer::sum); //Суммируем собранные потоки в конце
-        System.out.println("Время суммирования без использования параллельных стримов составило: " + (System.currentTimeMillis() - start) + " мс");
+        logger.info("Время выполнения без использования стрима составило: {}", System.currentTimeMillis() - start);
+        System.out.println("Время суммирования без использования метода parallel(), но со стримом составило: " + (System.currentTimeMillis() - start) + " мс"); //И так можно
 
         //Проверка времени сумирования без использования стрима вообще:
         start = System.currentTimeMillis();
+        logger.info("getIntegerParallelStream() без использования стрима:");
         int totalCount = 0;
         for (int i = 0; i <= 1000000; i++) {
             totalCount += i;
         }
-        System.out.println("Время суммирования без использования стрима составило: " + (System.currentTimeMillis() - start) + " мс");
+        logger.info("Время выполнения без использования стрима составило {}", System.currentTimeMillis() - start);
+        System.out.println("Время суммирования без использования стрима составило: " + (System.currentTimeMillis() - start) + " мс"); //И так можно
 
         return result;
     }
@@ -175,6 +183,7 @@ public class StudentService {
     //ДЗ-4.6 Потоки
     //Шаг 1: Несинхронизированный вывод студентов в 3-х параллельных потоках (вперемешку):
     public String getNameAllStudentsThread() {
+        logger.info("Метод getNameAllStudentsThread() - Несинхронизированный вывод студентов в 3-х параллельных потоках");
         List<Student> students = studentRepository.findAll();
         if (students.isEmpty()) {
             return null;
@@ -183,7 +192,8 @@ public class StudentService {
                 .map(Student::getName)
                 .collect(Collectors.toList());
         studentName.forEach(i -> System.out.println(i));
-        System.out.println("Запуск метода несинхронизированных потоков getNameAllStudentsThread():");
+
+        logger.info("Запуск метода несинхронизированных потоков getNameAllStudentsThread():");
 
         System.out.println("Основной поток:");
         studentName.stream().limit(2).forEach(System.out::println);
@@ -207,7 +217,8 @@ public class StudentService {
         if (students.isEmpty()) {
             return null;
         }
-        System.out.println("Запуск метода синхронизированных потоков getNameAllStudentsThreadSynchronization():");
+
+        logger.info("Запуск метода синхронизированных потоков getNameAllStudentsThreadSynchronization():");
 
         System.out.println("Основной поток:");
         synchronizePart(students, 0);
