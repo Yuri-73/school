@@ -104,6 +104,7 @@ public class FacultyService {
     //ДЗ-4.5 Параллельные и непараллельные стримы (только шаг 3, остальные шаги в классе-сервисе студента)
     //Шаг 3. Вывод самого длинного имени факультета в БД факультета с помощью стрима (непараллельного):
     public String longestFacultyName() {
+        logger.info("Вывод самого длинного имени факультета в БД факультета с помощью стрима (непараллельного) - longestFacultyName():");
         String longestWord = facultyRepository.findAll()
                 .stream().map(Faculty::getName)
                 .max(Comparator.comparingInt(String::length))
@@ -114,6 +115,7 @@ public class FacultyService {
 
     //Дополнительный метод для шага 3 ДЗ-4.5 - самое длинное слово 'color':
     public String longestFacultyColor() {
+        logger.info("Вывод самого длинного имени цвета факультета в БД с помощью стрима (непараллельного) - longestFacultyColor():");
         Optional<String> max = facultyRepository.findAll()
                 .stream().map(Faculty::getColor)
                 .max(Comparator.comparingInt(String::length));
