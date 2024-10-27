@@ -12,6 +12,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import ru.hogwarts.school.controller.StudentController;
@@ -65,11 +67,13 @@ class StudentControllerIntegro {
     private static String faculty_id = "green";
 
     @Test
+    @DirtiesContext
     void contextLoads() throws Exception { // Инициализация бина контроллера студента
         Assertions.assertThat(studentController).isNotNull();
     }
 
     @Test
+    @DirtiesContext
     public void createStudentTest() {
         //initial data:
         var s = student(name, age);
@@ -85,6 +89,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findStudentTest() {
         //initial data:
         var s = student(name, age);
@@ -100,6 +105,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void updateStudentTest() {
         //initial data:
         var s = student(name, age);
@@ -119,6 +125,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void deleteStudentTest() {
         //initial data:
         var s = student(name, age);
@@ -146,6 +153,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     void getAllStudentTest() {
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("test1", 24), Student.class);
@@ -172,6 +180,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getStudentByAgeTest() {
         //initial data:
         var s = student(name, age);
@@ -201,6 +210,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findByAgeBetweenStudentTest() { //Тест по промежутку возраста
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("test1", 16), Student.class);
@@ -242,6 +252,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getFacultyOfStudentTest() {
         //initial data:
         Faculty savedFaculty = restTemplate.postForObject("/faculty", faculty("ppp", "green"), Faculty.class);
@@ -274,6 +285,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findStudentsByFacultyNameTest() {
         //initial data:
         Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
@@ -322,6 +334,7 @@ class StudentControllerIntegro {
 
     //ДЗ-4.1(1) (@Query)
     @Test
+    @DirtiesContext
     public void getCountAllStudentsTest() {  //Тест на получениеобщего количества студентов
         //initial data:
         Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
@@ -344,6 +357,7 @@ class StudentControllerIntegro {
 
     //ДЗ-4.1(2) (@Query)
     @Test
+    @DirtiesContext
     public void getMidlAgeStudentsTest() {  //Тест на получение среднего возраста студентов
         //initial data:
         Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
@@ -367,6 +381,7 @@ class StudentControllerIntegro {
 
     //ДЗ-4.1(3) (@Query)
     @Test
+    @DirtiesContext
     public void getFiveLastBackStudentsTest() {  //Тест на получение 5 последних студентов
         //initial data:
         Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
@@ -405,6 +420,7 @@ class StudentControllerIntegro {
 
     //Тесты к ДЗ-4.5 Параллельные стримы:
     @Test
+    @DirtiesContext
     public void getAllNameStartsWithATest() { //Тест на получение коллекции имён на первую букву имени в верхнем регистре
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
@@ -424,6 +440,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getAllNameStartsWithA_NotFound_Test() { //Тест на получение коллекции имён на отсутствующую букву в имени
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
@@ -444,6 +461,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getMidlAgeAllStudentsTest() {  //Тест на получение среднего возраста введённых студентов
         //initial data:
         var s1 = restTemplate.postForObject("/student", student("t1", 16), Student.class);
@@ -462,6 +480,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getMidlAgeAllStudents_Zero_Test() {  //Тест на получение нулевого среднего возраста
         //test:
         var result = restTemplate.getForObject("/student/average/age", Integer.class);
@@ -472,6 +491,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getSumStreamParallel_Test() {
         //initial data:
         Integer summary = Stream.iterate(1, a -> a + 1)
@@ -485,6 +505,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void printStudentNamesThread_Test() {  ////Тест по выводу студентов в 3-х потоках без синхронизации
         //initial data:
         Student s1 = restTemplate.postForObject("/student", student("st1", 16), Student.class);
@@ -502,6 +523,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void printStudentNamesThread_EmptyList_Test() {  //Тест при параллельных потоках без коллекции студентов
         //test:
         ResponseEntity<String> result = restTemplate.exchange("/student/print-parallel",
@@ -513,6 +535,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void printStudentNamesThreadSynchronization_Test() {  //Тест по синхронизации вывода студентов
         //initial data:
         Student s1 = restTemplate.postForObject("/student", student("st1", 16), Student.class);
@@ -529,6 +552,7 @@ class StudentControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void printStudentNamesThreadSynchronization_EmptyList_Test() {  //Тест при синхронизации без коллекции студентов
         //test:
         ResponseEntity<String> result = restTemplate.exchange("/student/print-synchronized",

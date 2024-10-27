@@ -9,6 +9,8 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.hogwarts.school.controller.FacultyController;
 import ru.hogwarts.school.model.Faculty;
@@ -52,6 +54,7 @@ class FacultyControllerIntegro {
 //    }
 
     @Test
+    @DirtiesContext
     public void createFacultyTest() {
         //initial data:
         var request = faculty("f1", "anyColor");
@@ -81,6 +84,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getFacultyTest() {
         //initial data:
         var f = faculty("f1", "anyColor");
@@ -96,6 +100,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findByNameOrColorTest() throws Exception {
         //initial data:
         var f = faculty("f1", "anyColor");
@@ -116,6 +121,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void updateFacultyTest() {
         //initial data:
         var f = faculty("f1", "anyColor");
@@ -136,6 +142,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void deleteFacultyTest() {
         //initial data:
         var f = faculty("DeletedF1", "anyColor");
@@ -161,6 +168,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     void getAllFacultiesTest() {
         //initial data:
         var f1 = restTemplate.postForObject("/faculty", faculty("test1", "red"), Faculty.class);
@@ -202,6 +210,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void getStudentsOfFacultyTest() throws Exception {
         //initial data:
         Faculty f = restTemplate.postForObject("/faculty", faculty("Нормоконтроль", "green"), Faculty.class);
@@ -242,6 +251,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findByNameTest() {
         //initial data:
         var f = faculty("f1", "anyColor");
@@ -262,6 +272,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void findByColorIgnoreCaseTest() {
         //initial data:
         var f = faculty("f1", "anyColor");
@@ -282,6 +293,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void testGetFacultyByColor() {
         //initial data:
         var f = faculty("f1", "green");
@@ -301,6 +313,7 @@ class FacultyControllerIntegro {
 
     //Тесты для ДЗ-4.5 Параллельные стримы (4 тест-метода):
     @Test
+    @DirtiesContext
     public void longestNameFacultyTest() throws Exception {
         //initial data:
         var f = faculty("faculty-name", "color1");
@@ -318,6 +331,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void longestNameFaculty_EmptyName_Test() throws Exception {
         //test:
         ResponseEntity<String> result = restTemplate.exchange("/faculty/long-name",
@@ -330,6 +344,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void longestColorFaculty_Test() throws Exception {
         //initial data:
         var f = faculty("faculty-name", "color1");
@@ -348,6 +363,7 @@ class FacultyControllerIntegro {
     }
 
     @Test
+    @DirtiesContext
     public void longestColorFaculty_EmptyColor_Test() throws Exception {
         //test:
         ResponseEntity<String> result = restTemplate.exchange("/faculty/long-color",

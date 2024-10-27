@@ -1,16 +1,16 @@
 ALTER TABLE Student
     ADD CONSTRAINT CheckStudentAge CHECK(Age>=16);
-//Запись ограничения 'CheckStudentAge' студентов по возрасту.
-Не пройдёт ограничение, если в таблице уже есть студенты с возрастом, менее 16
+--Запись ограничения 'CheckStudentAge' студентов по возрасту.
+--Не пройдёт ограничение, если в таблице уже есть студенты с возрастом, менее 16
 
 ALTER TABLE Student
-DROP CONSTRAINT CheckStudentAge; //Снятие ограничения студентов по возрасту
+DROP CONSTRAINT CheckStudentAge; --Снятие ограничения студентов по возрасту
 
 ALTER TABLE Student
-    ADD CONSTRAINT UniqueStudentName UNIQUE(Name);  //Запись ограничения студентов по уникальности имени, т.е. вписать одинаковое имя не получится
+    ADD CONSTRAINT UniqueStudentName UNIQUE(Name);  --Ввод в готовую таблицу ограничения студентов по уникальности имени, т.е. вписать одинаковое имя не получится
 
 ALTER TABLE Student
-DROP CONSTRAINT UniqueStudentName; //Снятие ограничения студентов по уникальности имени
+DROP CONSTRAINT UniqueStudentName; --Снятие ограничения студентов по уникальности имени
 
 
 ALTER TABLE Student
