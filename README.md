@@ -4,7 +4,7 @@
 <h1 align="left">Сборка и запуск проекта</h1>
  <p><strong>1 . Склонируйте проект:</strong></p>
 <ul>
-   <li>git clone git@github.com:BuyanovMax/School.git</li>
+   <li>git clone [git@github.com:BuyanovMax/School](https://github.com/Yuri-73/school).git</li>
 </ul>
 <p><strong>2 . Разверните Docker контейнер:</strong></p>
 <ul>
