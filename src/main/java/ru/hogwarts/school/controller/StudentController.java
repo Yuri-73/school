@@ -28,7 +28,7 @@ public class StudentController {
      */
     public ResponseEntity<Student> createStudent(@RequestBody Student student) {
         Student student1 = studentService.createStudent(student);
-        return ResponseEntity.ok(student1); //В свагере увидим созданный объект в JSON
+        return ResponseEntity.ok(student1);
     }
 
     @GetMapping("{id}") // GET http://localhost:8090/student/1
@@ -37,9 +37,12 @@ public class StudentController {
      */
     public ResponseEntity<Student> findStudent(@PathVariable Long id) {
         if (studentService.findStudent(id) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1
+            /**
+             * Вывод 404 по варианту 1
+             */
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(studentService.findStudent(id));  //В свагере увидим выбранный объект в JSON
+        return ResponseEntity.ok(studentService.findStudent(id));
     }
 
     @PutMapping // PUT http://localhost:8090/student
@@ -48,9 +51,12 @@ public class StudentController {
      */
     public ResponseEntity<Student> editStudent(@RequestBody Student student) {
         if (studentService.editStudent(student) == null) {
-            return ResponseEntity.notFound().build(); //Если студента с этим Id не найдено, то выскочит по умолчанию 404. Вариант 2а
+            /**
+             * Вывод 404 по варианту 2а
+             */
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(studentService.editStudent(student)); //В свагере увидим отредактированный объект в JSON
+        return ResponseEntity.ok(studentService.editStudent(student));
     }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/student/1
@@ -60,7 +66,10 @@ public class StudentController {
     public ResponseEntity<Student> deleteStudent(@PathVariable Long id) {
         Student student = studentService.deleteStudent(id);
         if (student == null) {
-            return ResponseEntity.status(405).build(); //Если студента с этим Id нет, то 405. Вариант 3
+            /**
+             * Вывод 405 по варианту 3
+             */
+            return ResponseEntity.status(405).build();
         }
         return ResponseEntity.ok(student);
     }
@@ -87,7 +96,10 @@ public class StudentController {
      */
     public ResponseEntity<List<Student>> findByAgeBetweenStudent(@RequestParam Integer min, @RequestParam(required = false) Integer max) {
         if (studentService.findByAgeBetween(min, max).isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1;
+            /**
+             * Вывод 404 по варианту 1
+             */
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return ResponseEntity.ok(studentService.findByAgeBetween(min, max));
     }

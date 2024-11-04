@@ -47,9 +47,6 @@ public class FacultyController {
              */
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        /**
-         * В свагере увидим выбранный объект в JSON
-         */
         return ResponseEntity.ok(facultyService.findFaculty(id));
     }
 
@@ -60,14 +57,11 @@ public class FacultyController {
 //    @ApiResponses(code = 405, message = "Студент не найден")
     public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) {
         /**
-         * Если такого студента в Мапе нет, то выйдет 404:
+         * Если такого студента в Мапе нет, то 404:
          */
         if (facultyService.editFaculty(faculty) == null) {
             return ResponseEntity.notFound().build();
         }
-        /**
-         * В свагере увидим отредактированный объект в JSON:
-         */
         return ResponseEntity.ok(facultyService.editFaculty(faculty));
     }
 
@@ -79,7 +73,7 @@ public class FacultyController {
         Faculty faculty = facultyService.deleteFaculty(id);
         if (faculty == null) {
             /**
-             * Если факультета с этим Id нет, то выскочит 405. Вариант 3
+             * Если факультета с этим Id нет, то выскочет 405. Вариант 3
              */
             return ResponseEntity.status(405).build();
         }

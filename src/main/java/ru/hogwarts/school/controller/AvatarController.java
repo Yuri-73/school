@@ -45,11 +45,22 @@ public class AvatarController {
      * Чтение файла с из БД по id студента
      */
     public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
-        Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекта из БД
+        /**
+         * Получаем информацию о картинке как объекта из БД
+         */
+        Avatar avatar = studentAvatarService.findAvatar(id);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(avatar.getMediaType())); // Преобразование строчки с названием типа обратно в MediaType.
-        //Получится объект типа MediaType, который мы отправляем в качестве заголовка
-        headers.setContentLength(avatar.getData().length); // Другой заголовок - длина контента.
+        /**
+         * Преобразование строчки с названием типа обратно в MediaType.
+         */
+        headers.setContentType(MediaType.parseMediaType(avatar.getMediaType()));
+        /**
+         * Получится объект типа MediaType, который мы отправляем в качестве заголовка
+         */
+        headers.setContentLength(avatar.getData().length);
+        /**
+         * Другой заголовок - длина контента.
+         */
         return ResponseEntity.status(HttpStatus.OK).headers(headers).body(avatar.getData());
     }
 
@@ -59,11 +70,22 @@ public class AvatarController {
      */
     public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
         Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекте. Но почему получаем также, как из БД?   ***?***
-        Path path = Path.of(avatar.getFilePath()); // Путь к файлу на ЖД
-        try (InputStream is = Files.newInputStream(path); // Объявляем переменные обоих потоков.
-             // Выходной поток уже был создан, поэтому не через new, а через геттер:
-             OutputStream os = response.getOutputStream()) {
-            response.setContentType(avatar.getMediaType()); // Оба заголовка. Вернем тот же MediaType, который был сохранён в БД.
+        /**
+         * Путь к файлу на ЖД
+         */
+        Path path = Path.of(avatar.getFilePath());
+        /**
+         * Объявляем переменные обоих потоков
+         */
+        try (InputStream is = Files.newInputStream(path);
+             /**
+              * Выходной поток уже был создан, поэтому не через new, а через геттер:
+              */
+            OutputStream os = response.getOutputStream()) {
+            /**
+             * Вернет тот же MediaType, который был сохранён в БД
+             */
+            response.setContentType(avatar.getMediaType());
             response.setContentLength((int) avatar.getFileSize());
             is.transferTo(os);
         }
