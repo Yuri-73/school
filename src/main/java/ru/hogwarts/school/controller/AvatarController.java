@@ -29,7 +29,9 @@ public class AvatarController {
     }
 
     @PostMapping(value = "/{id}/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    //Загрузка файла на диск и в БД
+    /**
+     * Загрузка файла на диск и в БД
+     */
     public ResponseEntity<String> uploadAvatar(@PathVariable Long id, @RequestParam MultipartFile avat) throws IOException {
         if (avat.getSize() >= 1024 * 300) {
             return ResponseEntity.badRequest().body("Файл слишком большой");
@@ -39,8 +41,10 @@ public class AvatarController {
     }
 
     @GetMapping(value = "/{id}/avatar/preview")
+    /**
+     * Чтение файла с из БД по id студента
+     */
     public ResponseEntity<byte[]> downloadAvatar(@PathVariable Long id) {
-        // Чтение файла с из БД (здесь id студента)
         Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекта из БД
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(avatar.getMediaType())); // Преобразование строчки с названием типа обратно в MediaType.
@@ -50,8 +54,10 @@ public class AvatarController {
     }
 
     @GetMapping(value = "/{id}/avatar")
+    /**
+     * Чтение файла с с локального диска
+     */
     public void downloadAvatar(@PathVariable Long id, HttpServletResponse response) throws IOException {
-        // Чтение файла с с локального диска
         Avatar avatar = studentAvatarService.findAvatar(id); // Получаем информацию о картинке как объекте. Но почему получаем также, как из БД?   ***?***
         Path path = Path.of(avatar.getFilePath()); // Путь к файлу на ЖД
         try (InputStream is = Files.newInputStream(path); // Объявляем переменные обоих потоков.
@@ -63,8 +69,10 @@ public class AvatarController {
         }
     }
 
-    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
     @GetMapping(value = "/page-avatars")
+    /**
+     * Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+     */
     public ResponseEntity<List<Avatar>> getAllAvatarsPage(@RequestParam(value = "page", required = false, defaultValue = "1") Integer pageNumber,
                                                           @RequestParam(value = "size", required = false, defaultValue = "10") Integer pageSize) {
         if (pageNumber >= 1 && pageSize > 0) {

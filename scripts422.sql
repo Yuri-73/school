@@ -16,3 +16,5 @@ CREATE TABLE Cars (
                       Price DECIMAL(10, 2) NOT NULL
 );
 
+select People.Name, Cars.Brand from People INNER JOIN Cars C2 on C2.CarID = People.car_id
+
