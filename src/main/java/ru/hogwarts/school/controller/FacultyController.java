@@ -28,46 +28,79 @@ public class FacultyController {
     }
 
     @PostMapping // POST http://localhost:8090/faculty
-    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) { //Для записи факультетов по телу через свагер(постман)
+    /**
+     * Для записи факультетов по телу запроса через свагер(постман)
+     */
+    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) {
         Faculty faculty1 = facultyService.createFaculty(faculty);
         return ResponseEntity.ok(faculty1);
     }
 
     @GetMapping("{id}") // GET http://localhost:8090/faculty/1
-    public ResponseEntity<Faculty> findFaculty(@PathVariable Long id) { //Для получения факультета по индексу через свагер(постман)
+    /**
+     * Для получения факультета по индексу через свагер(постман)
+     */
+    public ResponseEntity<Faculty> findFaculty(@PathVariable Long id) {
         if (facultyService.findFaculty(id) == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND); //Выводим 404 по варианту 1
+            /**
+             * Выводим 404 по варианту 1
+             */
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        return ResponseEntity.ok(facultyService.findFaculty(id));  //В свагере увидим выбранный объект в JSON
+        /**
+         * В свагере увидим выбранный объект в JSON
+         */
+        return ResponseEntity.ok(facultyService.findFaculty(id));
     }
 
     @PutMapping // PUT http://localhost:8090/faculty
+    /**
+     * Для редактирования факультетов через свагер(постман)
+     */
 //    @ApiResponses(code = 405, message = "Студент не найден")
-    public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) { //Для редактирования факультетов через свагер(постман)
-        // Если такого студента в Мапе нет, то выйдет 404
+    public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) {
+        /**
+         * Если такого студента в Мапе нет, то выйдет 404:
+         */
         if (facultyService.editFaculty(faculty) == null) {
-            return ResponseEntity.notFound().build(); //Если факультет с этим Id не найден, то выскочит по умолчанию 404. Вариант 2
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(facultyService.editFaculty(faculty)); //В свагере увидим отредактированный объект в JSON
+        /**
+         * В свагере увидим отредактированный объект в JSON:
+         */
+        return ResponseEntity.ok(facultyService.editFaculty(faculty));
     }
 
     @DeleteMapping("{id}")  // DELETE http://localhost:8090/faculty/1
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) { //Для удаления факультета по id через Свагер
+    /**
+     * Для удаления факультета по id через Свагер
+     */
+    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long id) {
         Faculty faculty = facultyService.deleteFaculty(id);
         if (faculty == null) {
-            return ResponseEntity.status(405).build(); //Если факультета с этим Id нет, то выскочит 405. Вариант 3
+            /**
+             * Если факультета с этим Id нет, то выскочит 405. Вариант 3
+             */
+            return ResponseEntity.status(405).build();
         }
-        return ResponseEntity.ok(faculty); //При удалении студента по выбранному Id по умолчанию пропишется 404.
+        /**
+         * При удалении студента по выбранному Id по умолчанию пропишется 404.
+         */
+        return ResponseEntity.ok(faculty);
     }
 
-    @GetMapping() // GET http://localhost:8090/faculty
-    public ResponseEntity<Collection<Faculty>> getAllFaculty() { //Для вывода всех факультетов через свагер(постман)
+    @GetMapping()
+    /**
+     * Для вывода всех факультетов через свагер(постман)
+     */
+    public ResponseEntity<Collection<Faculty>> getAllFaculty() {
         return ResponseEntity.ok(facultyService.getAllFaculty());
     }
 
-    // ДЗ-3.2 Сваггер (без репозитория)
     @GetMapping(path = "/get/color")
-    //localhost:8090/faculty/get/color?color=green
+    /**
+     * ДЗ-3.2 Сваггер (без репозитория)
+     */
     String getFacultyByColor(@RequestParam(required = false) String color) {
         try {
             return "Факультеты с таким цветом найдены: " + facultyService.getFacultyByColor(color);
@@ -78,34 +111,46 @@ public class FacultyController {
         }
     }
 
-    //ДЗ-3.4 Введение в SQL шаг 1.2(1) (нахождение фака по его цвету через стандартный метод репозитория)
     @GetMapping("/by-color")
+    /**
+     * ДЗ-3.4 Введение в SQL шаг 1.2(1) (нахождение фака по его цвету через стандартный метод репозитория)
+     */
     public ResponseEntity<Faculty> findByColorIgnoreCase(@RequestParam String color) {
         return ResponseEntity.ok(facultyService.findByColorIgnoreCase(color));
     }
 
-    //ДЗ-3.4 Введение в SQL шаг 1.2(2) (нахождение фака по его имени через стандартный метод репозитория)
     @GetMapping("/by-name")
+    /**
+     * ДЗ-3.4 Введение в SQL шаг 1.2(2) (нахождение фака по его имени через стандартный метод репозитория)
+     */
     public ResponseEntity<Faculty> findByName(@RequestParam String name) {
         return ResponseEntity.ok(facultyService.findByName(name));
     }
 
-    // ДЗ-3.4 SQL шаг 1.2(3) (нахождение фака по его имени и цвету через стандартный метод репозитория - доп. метод)
+
     @GetMapping("/by-nameAndColor")
+    /**
+     * ДЗ-3.4 SQL шаг 1.2(3) (нахождение фака по его имени и цвету через стандартный метод репозитория - доп. метод)
+     */
     public ResponseEntity<Faculty> findByNameAndColor(@RequestParam String name,
                                                       @RequestParam String color) {
         return ResponseEntity.ok(facultyService.findByNameAndColor(name, color));
     }
 
-    // ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
+
     @GetMapping("/{id}/students")
+    /**
+     *  ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
+     */
     public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
         return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
     }
 
-    //ДЗ-4.5 (только шаг 3, остальные шаги в классе-сервисе студента)
-    //Вывод самого длинного имени факультета в БД факультета с помощью стрима:
     @GetMapping("/long-name")
+    /**
+     *  ДЗ-4.5 (только шаг 3, остальные шаги в классе-сервисе студента)
+     *  Вывод самого длинного имени факультета в БД факультета с помощью стрима:
+     */
     public ResponseEntity<String> longestNameFaculty() {
         String name = facultyService.longestFacultyName();
         if ((name.isEmpty())) {
@@ -114,8 +159,10 @@ public class FacultyController {
         return ResponseEntity.ok(name);
     }
 
-    //Вывод самого длинного цвета факультета в БД факультета с помощью стрима (дополнительный метод):
     @GetMapping("/long-color")
+    /**
+     *  Вывод самого длинного цвета факультета в БД факультета с помощью стрима (дополнительный метод к 4.5):
+     */
     public ResponseEntity<String> longestColorFaculty() {
         String color = facultyService.longestFacultyColor();
         if ((color.isEmpty())) {
