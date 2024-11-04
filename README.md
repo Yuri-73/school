@@ -2,11 +2,11 @@
  <p><strong>
 Проект по созданию и хранению записей студентов и факультетов</p>
 <h1 align="left">Сборка и запуск проекта</h1>
- <p><strong>1 . Склонируйте проект:</strong></p>
+ <p><strong>1. Склонируйте проект:</strong></p>
 <ul>
-   <li>git clone [git@github.com:BuyanovMax/School](https://github.com/Yuri-73/school).git</li>
+   <li> Скопируйте ссылку: https://github.com/Yuri-73/school</li>
 </ul>
-<p><strong>2 . Разверните Docker контейнер:</strong></p>
+<p><strong>2. Разверните Docker контейнер:</strong></p>
 <ul>
    <li>docker run --name postgres -e POSTGRES_PASSWORD=[password] -p 5433:5432 -d postgres</li>
 </ul>
@@ -22,7 +22,6 @@
    <li>Rest</li>
    <li>Git</li>
    <li>Swagger</li>
-   <li>Lombok</li>
    <li>Liquibase</li>
 </ul>
   <p><strong>База данных</strong></p>
@@ -33,6 +32,8 @@
 <ul>
    <li>JUnit</li>
   <li>Mockito</li>
+  <li>TestRestTemplate</li>
+  <li>WebMvcTest</li>
 </ul>
 <p><strong>Прочее</strong></p>
 <ul>
