@@ -9,14 +9,35 @@ public class Avatar {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String filePath; //Путь файла на диске, куда будем сохранять
-    private Long fileSize; //Размер файла на диске
-    private String mediaType; //Тип этого файла на диске
-    @Lob  //Создание поле внутри БД, где будем хранить нашу картинку, уменьшенную в размере
-    private byte[] data; //Переменная экземпляра для хранения массива байт в БД
+
+    /**
+     * Путь файла на диске, куда будем сохранять
+     */
+    private String filePath;
+
+    /**
+     * Размер файла на диске
+     */
+    private Long fileSize;
+
+    /**
+     * Тип файла на диске
+     */
+    private String mediaType;
+
+    /**
+     * Создание поля внутри БД, где будем хранить нашу картинку, уменьшенную в размере
+     * Переменная экземпляра для хранения массива байт в БД
+     */
+    @Lob
+    private byte[] data;
+
+    /**
+     * У студента м.б. только одна картинка (и наоборот).
+     */
     @OneToOne
     @JoinColumn(name = "student_id")
-    private Student student; //У студента м.б. только одна картинка (и наоборот).
+    private Student student;
 
     public Avatar() {
     }
