@@ -33,18 +33,23 @@ public class StudentAvatarService {
     private final StudentService studentService;
     private final StudentAvatarRepository studentAvatarRepository;
 
+    /**
+     * ДЗ-4.6 Включение логирования результатов для сервиса аватара
+     */
     private final Logger logger = LoggerFactory.getLogger(StudentAvatarService.class); //ДЗ-4.6 Включение логирования результатов
 
     public StudentAvatarService(StudentService studentService, StudentAvatarRepository studentAvatarRepository, @Value("${students.avatar.dir.path}") String avatarsDir) {
-        logger.info("The constructor of the StudentAvatarService class is launched");
+        logger.info("Вызов конструктора класса StudentAvatarService");
         this.studentService = studentService;
         this.studentAvatarRepository = studentAvatarRepository;
         this.avatarsDir = avatarsDir;
     }
 
-    public void uploadAvatar(Long id, MultipartFile file) throws IOException { // Метод входного потока для загрузки файла картинки
-        logger.info("Was invoked method for uploadAvatar");
-        // на указанное место на диске и в БД одновременно
+     /**
+     * Метод входного потока для загрузки файла картинки на указанное место на диске и в БД одновременно
+     */
+    public void uploadAvatar(Long id, MultipartFile file) throws IOException { //
+        logger.info("Старт метода uploadAvatar");
         Student student = studentService.findStudent(id); // Находим объект студента по id.
 
         Path filePath = Path.of(avatarsDir, id + "." + getExtension(file.getOriginalFilename()));  // Путь к файлу сохраняем в переменной filePath
@@ -72,14 +77,17 @@ public class StudentAvatarService {
     }
 
     public Avatar findAvatar(Long id) {
-        logger.info("Was invoked method for findAvatar");
+        logger.info("Старт метода нахождение аватара по его id findAvatar");
         Student student = studentService.findStudent(id); //Чтобы не выдавал 500, если нет в базе такого студента
         logger.debug("student found in the Database");
         return studentAvatarRepository.findByStudentId(id).orElse(new Avatar()); // Этот метод в репозитории следует писать
     }
 
-    public byte[] generateImagePreview(Path filePath) throws IOException { //Метод уменьшения картинки для БД
-        logger.info("Was invoked method for generate Image Preview");
+    /**
+     * Метод уменьшения картинки для внесения в БД
+     */
+    public byte[] generateImagePreview(Path filePath) throws IOException {
+        logger.info("Был вызван метод для создания предварительного просмотра изображения");
         try (InputStream is = Files.newInputStream(filePath);
             BufferedInputStream bis = new BufferedInputStream(is, 1024);
             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -95,14 +103,19 @@ public class StudentAvatarService {
         }
     }
 
+    /**
+     * Определение формата расширения файла
+     */
     private String getExtension(String filename) {
-        logger.info("Was invoked method for getExtension avatar");
+        logger.info("Был вызван метод для аватара getExtension");
         return filename.substring(filename.lastIndexOf(".") + 1);
-    } //Определение формата расширения файла
+    }
 
-    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+    /**
+     * Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+     */
     public List<Avatar> getAllAvatarsPage(Integer pageNumber, Integer pageSize) {
-        logger.info("Was invoked method for getAllavatar avatar");
+        logger.info("Был вызван метод для аватара getAllavatar");
         PageRequest pageRequest = PageRequest.of(pageNumber - 1, pageSize);
         return studentAvatarRepository.findAll(pageRequest).getContent();
     }

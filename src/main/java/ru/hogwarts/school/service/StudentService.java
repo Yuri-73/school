@@ -22,34 +22,53 @@ import java.util.stream.Stream;
 public class StudentService {
     private final StudentRepository studentRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(FacultyService.class); //ДЗ-4.6 Включение логирования результатов для студента
-    private final Object flag = new Object(); //ДЗ-4.6 Потоки
+    /**
+     * ДЗ-4.6 Включение логирования результатов для студента
+     */
+    private final Logger logger = LoggerFactory.getLogger(FacultyService.class);
+
+    /**
+     * ДЗ-4.6 Потоки. Создание флага для синхронайзера:
+     */
+    private final Object flag = new Object();
 
     public StudentService(StudentRepository studentRepository) {
-        logger.info("The constructor of the StudentService class is launched");
+        logger.info("Запуск конструктора класса StudentService");
         this.studentRepository = studentRepository;
     }
 
+    /**
+     * Внесение в БД нового студента:
+     */
     public Student createStudent(Student student) {
-        logger.info("Was invoked method for create student");
+        logger.info("Вызван метод для создания студента");
         return studentRepository.save(student);
     }
 
+    /**
+     * Нахождение выбранного студента по id:
+     */
     public Student findStudent(Long id) {
-        logger.info("a method for searching a student by its id has been launched: " + id);
+        logger.info("Запущен метод поиска ученика по его идентификатору: " + id);
         Student student = studentRepository.findById(id).orElseThrow(() -> new StudentNotFoundException(id));
         return student;
     }
 
+    /**
+     * Редактирование выбранного студента:
+     */
     public Student editStudent(Student student) {
-        logger.info("Student editing method started");
+        logger.info("Метод редактирования учащихся запущен");
         return studentRepository.findById(student.getId())
                 .map(e -> studentRepository.save(student))
                 .orElse(null);
     }
 
+    /**
+     * Удаление выбранного студента по id:
+     */
     public Student deleteStudent(Long id) {
-        logger.info("Method deleteStudent started");
+        logger.info("Старт метода deleteStudent");
         var entity = studentRepository.findById(id).orElse(null);
         if (entity != null) {
             studentRepository.delete(entity);
@@ -57,16 +76,21 @@ public class StudentService {
         return entity;
     }
 
+    /**
+     * Вывод всех студентов:
+     */
     public Collection<Student> getAllStudent() {
-        logger.info("Method getAllStudent started");
+        logger.info("Старт метода getAllStudent");
         return studentRepository.findAll();
     }
 
-    //ДЗ-3.3:
+    /**
+     * ДЗ-3.3:
+     */
     public Collection<Student> getStudentByAge(Integer age) {
-        logger.info("Method getStudentByAge started");
+        logger.info("Старт метода getStudentByAge");
         if (age <= 0) {
-            logger.error("Attention! age = " + age + " <= 0");
+            logger.error("Внимание! возраст " + age + " <= 0");
             throw new NullAgeException(age);
         }
         Collection<Student> studentListByAge = getAllStudent()
@@ -74,53 +98,68 @@ public class StudentService {
                 .filter(e -> e.getAge() == age)
                 .collect(Collectors.toList());
         if (studentListByAge.isEmpty()) {
-            logger.error("There are no students of this age on the list");
+            logger.error("В списке нет учеников этого возраста");
             throw new NoStudentAgeException(age);
         }
-        logger.debug("Age variable is valid");
+        logger.debug("Возрастная переменная действительна");
         return studentListByAge;
     }
 
-    //ДЗ-3.4 шаг 1.1:
+    /**
+     * ДЗ-3.4 шаг 1.1:
+     */
     public List<Student> findByAgeBetween(Integer min, Integer max) {
-        logger.info("Method findByAgeBetween started");
+        logger.info("Старт метода findByAgeBetween");
         return studentRepository.findByAgeBetween(min, max);
     }
 
-    //ДЗ-3.4 шаг 4.2* (по имени факультета):
+    /**
+     * ДЗ-3.4 шаг 4.2* (по имени факультета):
+     */
     public Collection<Student> findStudentsByFacultyName(String facultyName) {
-        logger.info("Method findStudentsByFacultyName started");
+        logger.info("Старт метода findStudentsByFacultyName");
         return studentRepository.findStudentsByFacultyName(facultyName);
     }
 
-    //ДЗ-3.4 шаг 4.2 (по Id студента):
+    /**
+     * ДЗ-3.4 шаг 4.2 (по Id студента):
+     */
     public Faculty getFacultyOfStudent(Long id) {
-        logger.info("Method getFacultyOfStudent started");
+        logger.info("Старт метода getFacultyOfStudent");
         return studentRepository.findById(id)
                 .map(Student::getFaculty)
                 .orElse(null);
     }
 
-    //Методы для SQL-запросов из БД (3 шт.): шаг 1 ДЗ-4.1:
+    /**
+     * Методы для SQL-запросов из БД (3 шт.): шаг 1 ДЗ-4.1:
+     */
     public Integer getCountAllStudentInSchool() {
-        logger.info("Method getCountAllStudentInSchool started");
+        logger.info("Старт метода getCountAllStudentInSchool");
         return studentRepository.getAllStudentInSchool();
     }
 
+    /**
+     * Вывод среднего возраста всех студентов (2-ой метод шага 1 ДЗ-4.1)
+     */
     public Integer getMidlAgeStudent() {
-        logger.info("Method getMidlAgeStudent started");
+        logger.info("Старт метода getMidlAgeStudent");
         return studentRepository.getMidlAgeStudent();
     }
 
+    /**
+     * 5 студентов из БД в обратном порядке(3-й метод шага 1 ДЗ-4.1)
+     */
     public List<Student> getFiveLastBackStudents() {
-        logger.info("Method getFiveLastBackStudents started");
-        // в БД в обратном порядке(третий метод шага 1 ДЗ-4.1)
+        logger.info("Старт метода getFiveLastBackStudents");
         return studentRepository.getFiveLastBackStudents();
     }
 
-    //ДЗ-4.5
-    //Шаг 1. Вывод всех имён студентов, начинающихся с одной и той же буквы,
-    // а также отсортированных в алфавитном порядке и находящихся в верхнем регистре:
+    /**
+     *  ДЗ-4.5
+     *  Шаг 1. Вывод всех имён студентов, начинающихся с одной и той же буквы,
+     *  а также отсортированных в алфавитном порядке и находящихся в верхнем регистре:
+     */
     public List<String> getAllNameStartsWithLetter(String letter) {
         System.out.println("letter: " + letter);
         logger.info("Метод getAllNameStartsWithLetter() - Вывод всех имён студентов, начинающихся с одной и той же буквы {}", letter);
@@ -134,7 +173,9 @@ public class StudentService {
                 .collect(Collectors.toList()); //Терминальная функция собирания имён в коллекцию
     }
 
-    //Шаг 2. Вывод среднего возраста всех студентов, находящихся в БД студентов:
+    /**
+     * Шаг 2. Вывод среднего возраста всех студентов, находящихся в БД студентов:
+     */
     public Integer getMidlAgeAllStudents() {
         logger.info("Метод getMidlAgeAllStudents() - Вывод среднего возраста всех студентов, находящихся в БД студентов:");
         double average = studentRepository.findAll()
@@ -146,7 +187,9 @@ public class StudentService {
         return (int) average;
     }
 
-    //Шаг 4. Вывод целого числа, полученного суммой всех значений от 1 до 1000 с помощью параллельного стрима:
+    /**
+     * Шаг 4. Вывод целого числа, полученного суммой всех значений от 1 до 1000 с помощью параллельного стрима:
+     */
     public Integer getIntegerParallelStream() {
         //Проверка времени сумирования с использованием метода parallel():
         long start = System.currentTimeMillis();
@@ -183,8 +226,10 @@ public class StudentService {
         return result;
     }
 
-    //ДЗ-4.6 Потоки
-    //Шаг 1: Несинхронизированный вывод студентов в 3-х параллельных потоках (вперемешку):
+    /**
+     * ДЗ-4.6 Потоки
+     * Шаг 1: Несинхронизированный вывод студентов в 3-х параллельных потоках (вперемешку):
+     */
     public String getNameAllStudentsThread() {
         logger.info("Метод getNameAllStudentsThread() - Несинхронизированный вывод студентов в 3-х параллельных потоках");
         List<Student> students = studentRepository.findAll();
@@ -214,7 +259,9 @@ public class StudentService {
         return students.toString();
     }
 
-    //Шаг 2: Синхронизированный вывод студентов в 3-х параллельных потоках (но в соответствии с очерёдностью вывода через getAllStudent()):
+    /**
+     * Шаг 2: Синхронизированный вывод студентов в 3-х параллельных потоках (но в соответствии с очерёдностью вывода через getAllStudent()):
+     */
     public String getNameAllStudentsThreadSynchronization() {
         List<Student> students = studentRepository.findAll();
         if (students.isEmpty()) {
@@ -242,7 +289,9 @@ public class StudentService {
         return students.toString();
     }
 
-    //Метод к ДЗ-4.6 с блоком синхронизации для getNameAllStudentsThreadSynchronization():
+    /**
+     * Метод к ДЗ-4.6 с блоком синхронизации для getNameAllStudentsThreadSynchronization():
+     */
     private void synchronizePart(List<Student> students, int index) {
         synchronized (flag) {
             if (index >= 0 && index < students.size()) {

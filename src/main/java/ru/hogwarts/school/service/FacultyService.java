@@ -19,33 +19,48 @@ public class FacultyService {
 
     private final FacultyRepository facultyRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(FacultyService.class); //ДЗ-4.6 Включение логирования результатов для факультета
+    /**
+     * ДЗ-4.6 Включение логирования результатов для факультета
+     */
+    private final Logger logger = LoggerFactory.getLogger(FacultyService.class);
 
     public FacultyService(FacultyRepository facultyRepository) {
-        logger.info("The constructor of the FacultyService class is launched");
+        logger.info("Запуск конструктора класса FacultyService");
         this.facultyRepository = facultyRepository;
     }
 
+    /**
+     * Внесение носого факультета в БД:
+     */
     public Faculty createFaculty(Faculty faculty) {
-        logger.info("Was invoked method for create faculty");
+        logger.info("Старт метода createFaculty");
         return facultyRepository.save(faculty);
     }
 
+    /**
+     * Нахождение факультета по его id:
+     */
     public Faculty findFaculty(Long id) {
-       logger.info("a method for searching a faculty by its id has been launched: " + id);
+       logger.info("Старт метода findFaculty с id = " + id);
        Faculty faculty = facultyRepository.findById(id).orElse(null);
        return faculty;
     }
 
+    /**
+     * Редактирование факультета:
+     */
     public Faculty editFaculty(Faculty faculty) {
-        logger.info("Faculty editing method started");
+        logger.info("Старт метода editFaculty");
         return facultyRepository.findById(faculty.getId())
                 .map(e -> facultyRepository.save(faculty))
                 .orElse(null);
     }
 
+    /**
+     * Удаление факультета по его id:
+     */
     public Faculty deleteFaculty(Long id) {
-        logger.info("Method deleteFaculty started");
+        logger.info("Старт метода deleteFaculty");
         var entity = facultyRepository.findById(id).orElse(null);
         if (entity != null) {
             facultyRepository.delete(entity);
@@ -53,14 +68,19 @@ public class FacultyService {
         return entity;
     }
 
+    /**
+     * Вывод всех факультетов из БД:
+     */
     public Collection<Faculty> getAllFaculty() {
-        logger.info("Method getAllFaculty started");
+        logger.info("Старт метода getAllFaculty");
         return facultyRepository.findAll();
     }
 
-    //ДЗ-3.3:
+    /**
+     *  ДЗ-3.3: Нахождение факультета по его цвету:
+     */
     public Collection<String> getFacultyByColor(String color) {
-        logger.info("Method getFacultyByColor started");
+        logger.info("Старт метода getFacultyByColor");
         if (color == null || color.isEmpty()) {
             logger.error("There is no such color = " + color);
             throw new NullEmptyColorException();
@@ -71,49 +91,65 @@ public class FacultyService {
                 .map(e -> e.getName())
                 .collect(Collectors.toList());
         if (facultyListByColor.isEmpty()) {
-            logger.error("There is not faculty with color = " + color);
+            logger.error("Отсутствует факультет с color = " + color);
             throw new NoFacultyColorException();
         }
         return facultyListByColor;
     }
 
-    //ДЗ-3.4 шаг 1.2:
+    /**
+     *  ДЗ-3.4 шаг 1.2: Нахождение факультета по его цвету с игнорированием разряда color:
+     */
     public Faculty findByColorIgnoreCase(String color) {
-        logger.info("Method findByColorIgnoreCase started");
+        logger.info("Старт метода findByColorIgnoreCase");
         return facultyRepository.findByColorIgnoreCase(color);
     }
 
-    //ДЗ-3.4 шаг 1.2(доп.):
+    /**
+     *  ДЗ-3.4 шаг 1.2(доп.): Нахождение факультета по его имени и цвету:
+     */
     public Faculty findByNameAndColor(String name, String color) {
-        logger.info("Method findByNameAndColor started");
+        logger.info("Старт метода findByNameAndColor");
         return facultyRepository.findByNameAndColor(name, color);
     }
 
+     /**
+     *  ДЗ-3.4 шаг 1.2(доп.): Нахождение факультета по его имени:
+     */
     public Faculty findByName(String name) {
-        logger.info("Method findByName started");
+        logger.info("Старт метода findByName");
         return facultyRepository.findByName(name);
     }
 
+     /**
+     *  Нахождение студентов по id их факультета:
+     */
     public Collection<Student> getStudentsOfFaculty(Long id) {
-        logger.info("Method getStudentsOfFaculty started");
+        logger.info("Старт метода getStudentsOfFaculty");
         return facultyRepository.findById(id)
                 .map(Faculty::getStudents)
                 .orElse(Collections.emptyList());
     }
 
-    //ДЗ-4.5 Параллельные и непараллельные стримы (только шаг 3, остальные шаги в классе-сервисе студента)
-    //Шаг 3. Вывод самого длинного имени факультета в БД факультета с помощью стрима (непараллельного):
+     /**
+     *  ДЗ-4.5 Параллельные и непараллельные стримы (только шаг 3, остальные шаги в классе-сервисе студента)
+     *  Шаг 3. Вывод самого длинного имени факультета в БД факультета с помощью стрима (непараллельного):
+     */
     public String longestFacultyName() {
         logger.info("Вывод самого длинного имени факультета в БД факультета с помощью стрима (непараллельного) - longestFacultyName():");
         String longestWord = facultyRepository.findAll()
                 .stream().map(Faculty::getName)
                 .max(Comparator.comparingInt(String::length))
                 .orElse("");
-        //Метод определения слова в опшине String с максимальным количеством букв
-        return longestWord;  //Если коллекция String пустая, то выдает не код ошибки, а пустую строку.
+         /**
+         *  Если коллекция String пустая, то выдает не код ошибки, а пустую строку
+         */
+        return longestWord;
     }
 
-    //Дополнительный метод для шага 3 ДЗ-4.5 - самое длинное слово 'color':
+    /**
+     *  Дополнительный метод для шага 3 ДЗ-4.5 - самое длинное слово 'color':
+     */
     public String longestFacultyColor() {
         logger.info("Вывод самого длинного имени цвета факультета в БД с помощью стрима (непараллельного) - longestFacultyColor():");
         Optional<String> max = facultyRepository.findAll()
