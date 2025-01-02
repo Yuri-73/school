@@ -26,7 +26,7 @@
    <li>docker run --name postgres -e POSTGRES_PASSWORD=[password] -p 5433:5432 -d postgres</li>
 </ul>
 
-<h1 align="left">Стек Технологий:</h1>
+<h1 align="left">Стек технологий:</h1>
   <p><strong>Язык и Окружение</strong></p>
 <ul>
    <li>Java 17</li>
