@@ -325,7 +325,7 @@ class StudentControllerIntegro {
         return s;
     }
 
-    static Faculty faculty(String name, String color) {
+    private static Faculty faculty(String name, String color) {
         var f = new Faculty();
         f.setName(name);
         f.setColor(color);

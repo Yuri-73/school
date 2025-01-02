@@ -121,7 +121,7 @@ public class StudentControllerWebMvcTest {
         //test:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student/" + student2.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))
                 //check:
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(student.getName()))
@@ -162,7 +162,7 @@ public class StudentControllerWebMvcTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/student/")
                         .content(updateStudent.toString())  //Передача тела объекта updateFacultyRq в контроллер в виде строки по заданному URL
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON) //Передача типа (контента JSON)
                         .accept(MediaType.APPLICATION_JSON))  //Получение тела объекта
                 //check:
                 .andExpect(status().isOk())  //Если тест проходит, то статус 200
@@ -175,17 +175,17 @@ public class StudentControllerWebMvcTest {
     @Test
     public void getAllStudentMvcTest() throws Exception {
         //initial data:
-        when(studentRepository.findAll()).thenReturn(Collections.singletonList(student));
+        when(studentRepository.findAll()).thenReturn(Collections.singletonList(student)); //Конструкция, позволяющая создать коллекцию из 1 элемента
         //test:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/student")
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)) //Получение тела объекта
                 //check:
                 .andExpect(status().isOk())
                 //Выдаётся в виде JSON-коллекции:
                 .andExpect(MockMvcResultMatchers.content().json(mapper.writeValueAsString(Collections.singletonList(student))))
                 .andExpect(jsonPath("$").isArray()) //Превращение JSON-Листа-одиночки в JSON-массив студентов из одного объекта
-                .andExpect(jsonPath("$[0].name").value(student.getName()))
+                .andExpect(jsonPath("$[0].name").value(student.getName())) //Пробежка по полученному массиву
                 .andExpect(jsonPath("$[0].age").value(student.getAge()));
 
 

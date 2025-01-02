@@ -69,7 +69,7 @@ class FacultyControllerIntegro {
         repository.deleteById(result.getId());  //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама!
     }
 
-    static Faculty faculty(String name, String color) {
+    private static Faculty faculty(String name, String color) {
         var f = new Faculty();
         f.setName(name);
         f.setColor(color);
@@ -152,19 +152,19 @@ class FacultyControllerIntegro {
                 "/faculty/" + saved.getId(),
                 HttpMethod.DELETE,
                 null,
-                Faculty.class);
+                Faculty.class);  //DELETE-метод должен выдать удалённый объект
         //check:
-        Assertions.assertThat(facultyEntity.getBody().getName()).isEqualTo("DeletedF1");
-        Assertions.assertThat(facultyEntity.getBody().getColor()).isEqualTo("anyColor");
+        Assertions.assertThat(facultyEntity.getBody().getName()).isEqualTo("DeletedF1"); //Убеждаемся
+        Assertions.assertThat(facultyEntity.getBody().getColor()).isEqualTo("anyColor"); //Убеждаемся
         //test:
-        var deletedF1 = restTemplate.getForObject("/faculty/" + saved.getId(), Faculty.class);
+        var deletedF1 = restTemplate.getForObject("/faculty/" + saved.getId(), Faculty.class); //ГЕТ-метод (через getForObject) должен выдать null
         //check:
         Assertions.assertThat(deletedF1).isNull();
         //test:
         ResponseEntity<Faculty> resultAfterDelete = restTemplate.exchange("/faculty/" + saved.getId(),
-                HttpMethod.GET, null, Faculty.class);
+                HttpMethod.GET, null, Faculty.class); //ГЕТ-метод (через exchange) должен выдать null
         //check:
-        assertThat(resultAfterDelete.getStatusCodeValue()).isEqualTo(404);
+        assertThat(resultAfterDelete.getStatusCodeValue()).isEqualTo(404); //Убеждаемся в null (в контроллере null преобразуется в статус 404)
     }
 
     @Test
@@ -206,7 +206,7 @@ class FacultyControllerIntegro {
 //        assertThat(faculties1[0].getName()).isEqualTo("Name"); //Не пройдёт, потому что не знаю место расположения newFacultyResponse.getBody() в массиве (он у меня изначально заполнен)
 
         //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
-        repository.deleteById(f3.getId() + 1l); //Не смог вывести id из newFacultyResponse (newFacultyResponse..getBody().getId не проходит)
+        repository.deleteById(f3.getId() + 1l); //Не смог вывести id из newFacultyResponse (newFacultyResponse.getBody().getId не проходит)
     }
 
     @Test
@@ -237,11 +237,14 @@ class FacultyControllerIntegro {
         Assertions.assertThat(actual.size()).isEqualTo(2);
         Assertions.assertThat(actual).contains(saved1);
         Assertions.assertThat(actual).contains(saved2);
+
         //cleaning students:
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         ResponseEntity<Student> studentEntity1 = restTemplate.exchange(
                 "/student/" + saved1.getId(),
                 HttpMethod.DELETE, null, Student.class
         );
+        //Очищение от тестовых данных. Но теперь не имеет смысла, т.к. тест-БД очищается сама.
         ResponseEntity<Student> studentEntity2 = restTemplate.exchange(
                 "/student/" + saved2.getId(),
                 HttpMethod.DELETE, null, Student.class
@@ -278,7 +281,7 @@ class FacultyControllerIntegro {
         var f = faculty("f1", "anyColor");
         var saved = restTemplate.postForObject("/faculty", f, Faculty.class);
         //test:
-        var result = restTemplate.getForObject("/faculty/by-color?color=AnyColor", Faculty.class);
+        var result = restTemplate.getForObject("/faculty/by-color?color=ANYColor", Faculty.class);
         //check:
         Assertions.assertThat(result.getName()).isEqualTo("f1");
         Assertions.assertThat(result.getColor()).isEqualTo("anyColor");
@@ -323,7 +326,7 @@ class FacultyControllerIntegro {
         var saved2 = restTemplate.postForObject("/faculty", f2, Faculty.class);
         var saved3 = restTemplate.postForObject("/faculty", f3, Faculty.class);
         //test:
-        var result = restTemplate.getForObject("/faculty/long-name", String.class);
+        var result = restTemplate.getForObject("/faculty/long-name", String.class); //Находим самое длинное имя
         //check:
         Assertions
                 .assertThat(result).isNotNull()
@@ -334,13 +337,14 @@ class FacultyControllerIntegro {
     @DirtiesContext
     public void longestNameFaculty_EmptyName_Test() throws Exception {
         //test:
+        //ГЕТ-запрос способом через exchange:
         ResponseEntity<String> result = restTemplate.exchange("/faculty/long-name",
                 HttpMethod.GET, null, String.class);
-        var longestName = result.getBody();
+        var longestName = result.getBody();  //Преобразование в объект
         //check:
         Assertions
                 .assertThat(longestName).isNull();
-        Assertions.assertThat(result.getStatusCode().toString()).isEqualTo("404 NOT_FOUND");
+        Assertions.assertThat(result.getStatusCode().toString()).isEqualTo("404 NOT_FOUND"); //Стандартный ответ по статусу 404
     }
 
     @Test

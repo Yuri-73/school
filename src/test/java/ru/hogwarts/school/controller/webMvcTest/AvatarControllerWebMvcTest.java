@@ -73,18 +73,18 @@ public class AvatarControllerWebMvcTest {
 
     private ObjectMapper mapper = new ObjectMapper();
 
-    //ДЗ-3.6(1)
+    //ДЗ-3.6(1): Внесение в БД и на диск (как бы внесение - там заглушки) тест-файла mockMultipartFile
     @Test
     void uploadAvatarTest() throws Exception {
         //входные условия:
-        Student student = new Student(1L, "Nikolay", 30);
+        Student student = new Student(388L, "Nikolay", 30);
         byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
         Avatar avatar = new Avatar();
-        avatar.setData(bytes);
-        avatar.setFilePath("/1L.pdf");
-        avatar.setFileSize(11L);
-        avatar.setStudent(student);
-        avatar.setMediaType(".pdf");
+//        avatar.setData(bytes); //Эти и последующие назначения следует удалить, т.к. avatar их получает внутри рабочего метода uploadAvatar() класса StudentAvatarService
+//        avatar.setFilePath("/1L.pdf");
+//        avatar.setFileSize(45L);
+//        avatar.setStudent(student);
+//        avatar.setMediaType(".pdf");
 
         when(studentRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(student));
         when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
@@ -95,30 +95,32 @@ public class AvatarControllerWebMvcTest {
 
         MockMultipartFile mockMultipartFile = new MockMultipartFile("avat", name, MediaType.MULTIPART_FORM_DATA_VALUE, bytes);
 
-        //тест:
+        //тест: делаем запрос на укладку картинки по id студента (в БД она не попадает - там заглушка, поэтому в Сваггере по id=388 картинку не получить) и телу запроса - mockMultipartFile
         MvcResult mvcResult = mockMvc.perform(multipart("/" + student.getId() + "/avatar")
                         .file(mockMultipartFile))
-                .andDo(MockMvcResultHandlers.print())
+                .andDo(MockMvcResultHandlers.print()) //Распечатываем в логах теста контент запроса и вывода
                 .andExpect(status().isOk())
                 .andReturn();
 
-        //?
+        //Почему-то не распечатывается. Может, из-за того, что uploadAvatar ничего не выдаёт из себя.
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         System.out.println("!!!");
-        System.out.println("jsonResponse" + jsonResponse);
+        System.out.println("jsonResponse: " + jsonResponse);
 
         //контроль:
         assertNotNull(avatar);
         System.out.println(avatar.getFilePath());
-        assertEquals(avatar.getFilePath(), "avatars\\1.jpg"); //Объект получил новый путь
+        assertEquals(avatar.getFilePath(), "avatars\\388.jpg"); //Аватарка получила новый путь, благодаря id=388 и положена в папку avatars
         assertEquals(avatar.getStudent(), student);
+        System.out.println("avatar.getFileSize() - " +avatar.getFileSize());
+        System.out.println("bytes.length - " +bytes.length);
         assertEquals(avatar.getFileSize(), bytes.length);
         assertTrue(Files.isReadable(Path.of("src/test/resources/test.jpg")));
     }
 
-    //ДЗ-3.6(2)
+    //ДЗ-3.6(2): Поиск картинки как бы из БД
     @Test
-    void downloadAvatarFromDatabaseTest() throws Exception {  //Тест проходит, но проверить вывод массива байт не могу
+    void downloadAvatarFromDatabaseTest() throws Exception {
         //входные условия:
         Student student = new Student(1L, "Nikolay", 30);
         byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
@@ -144,7 +146,7 @@ public class AvatarControllerWebMvcTest {
         assertArrayEquals(bytes, result.getResponse().getContentAsByteArray());
     }
 
-    //ДЗ-3.6(3)
+    //ДЗ-3.6(3): получение картинки с диска (с БД информация не идёт, а имитируется через заглушку)
     @Test
     void downloadAvatarFromFileTest() throws Exception {
         //входные условия:
@@ -161,13 +163,14 @@ public class AvatarControllerWebMvcTest {
         when(studentAvatarRepository.findByStudentId(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(avatar));
 
         //тест:
-        mockMvc.perform(MockMvcRequestBuilders
+        var result = mockMvc.perform(MockMvcRequestBuilders
                         .get("/" + student.getId() + "/avatar")
                         .accept(MediaType.APPLICATION_OCTET_STREAM))
                 //контроль:
                 .andExpectAll()
                 .andExpect(status().isOk())
                 .andReturn();
+        assertArrayEquals(bytes, result.getResponse().getContentAsByteArray());
     }
 
     //ДЗ-4.1(page с валидными параметрами)

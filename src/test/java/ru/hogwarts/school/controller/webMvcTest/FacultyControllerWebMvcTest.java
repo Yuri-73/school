@@ -99,33 +99,34 @@ public class FacultyControllerWebMvcTest {
         //test:
         mockMvc.perform(MockMvcRequestBuilders
                         .post("/faculty")
-                        .content(facultyObject.toString())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .content(facultyObject.toString()) //Тело запроса JSON в виде строки
+                        .contentType(MediaType.APPLICATION_JSON) //Тип запроса - JSON
+                        .accept(MediaType.APPLICATION_JSON)) //Тип ответа - JSON
                 //check:
                 .andExpect(status().isOk())  //then
-                .andExpect(jsonPath("$.name").value(faculty.getName()))
+                .andExpect(jsonPath("$.name").value(faculty.getName())) //Ответ - JSON
                 .andExpect(jsonPath("$.color").value(faculty.getColor()));
-        verify(facultyRepository, Mockito.times(1)).save(any());
+        verify(facultyRepository, Mockito.times(1)).save(any()); //Убеждаемся, что метод вызывался 1 раз
     }
 
     @Test
     public void createFacultyMvcMapperStreamTest() throws Exception {  //Ввод факультета продвинутым способом через mapper и stream (помощь от Громовой)
         //initial data:
-        Faculty facultyFaker = generateFacultyFaker();  //
-        faculty.setName(facultyFaker.getName());
+        Faculty facultyFaker = generateFacultyFaker();  //Генерация объекта случайным образом
+        faculty.setName(facultyFaker.getName()); //Вывод имени случайного объекта
         System.out.println("faculty.getName: " + faculty.getName());
-        faculty.setColor(facultyFaker.getColor());
+        faculty.setColor(facultyFaker.getColor()); //Вывод цвета случайного объекта
         System.out.println("faculty.getColor: " + faculty.getColor());
-        when(facultyRepository.save(ArgumentMatchers.any())).thenReturn(faculty);
+        when(facultyRepository.save(ArgumentMatchers.any())).thenReturn(faculty); //Заглушка на сохранение и выдачу факультета
         //test:
         mockMvc.perform(
                         MockMvcRequestBuilders.post("/faculty")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(facultyFaker)))
+                                .contentType(MediaType.APPLICATION_JSON) //Тип запроса - JSON
+                                .content(mapper.writeValueAsString(facultyFaker))) //Вместо JSON-факультета JSON генерируется из facultyFaker (сериализация)
                 //check:
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(result -> {
+                    //Десериализуем полученный JSON-факультет:
                     Faculty facultyResult = mapper.readValue(
                             result.getResponse().getContentAsString(),
                             Faculty.class
@@ -145,7 +146,7 @@ public class FacultyControllerWebMvcTest {
         //test:
         mockMvc.perform(MockMvcRequestBuilders
                         .get("/faculty/" + faculty.getId())
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON)) //Тип ответа - JSON
                 //check:
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value(faculty.getName()))
@@ -191,9 +192,9 @@ public class FacultyControllerWebMvcTest {
                     String responseString = result.getResponse().getContentAsString();
                     assertThat(responseString).isNotNull();
                 });
-        verify(facultyRepository, never()).save(any());
+        verify(facultyRepository, never()).save(any());  //Убеждаемся, что метод не работал ни разу
         verify(facultyRepository, never()).delete(any());
-        verify(facultyRepository, times(2)).findById(any());
+        verify(facultyRepository, times(2)).findById(any()); //Убеждаемся, что метод работал 2 раза
     }
 
     @Test
@@ -201,7 +202,8 @@ public class FacultyControllerWebMvcTest {
 //                .andExpect(content().string(""));  //Убеждаемся, что ничего нет на выходе
         //initial data:
         when(facultyRepository.findById(ArgumentMatchers.any(Long.class))).thenReturn(Optional.of(faculty));
-        doNothing().when(facultyRepository).deleteById(id); //Пустая заглушка вместо метода facultyRepository.deleteById()
+        doNothing().when(facultyRepository).deleteById(id); //Пустая заглушка для void-метода facultyRepository.deleteById(),
+        // чтобы исключить реальное удаление факультета из БД (хотя, наверное, строка бесполезна, т.к. у нас БД Н2)
         //test:
         mockMvc.perform(MockMvcRequestBuilders
                         .delete("/faculty/" + id)
@@ -228,6 +230,7 @@ public class FacultyControllerWebMvcTest {
                 //check:
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(result -> {
+                    //десериализация факультета на выходе:
                     Faculty facultyResult = mapper.readValue(
                             result.getResponse().getContentAsString(),
                             Faculty.class);
@@ -238,16 +241,16 @@ public class FacultyControllerWebMvcTest {
                     assertThat(facultyResult.getName()).isEqualTo(faculty.getName());
                 });
         verify(facultyRepository, Mockito.times(1)).delete(any());
-        Mockito.reset(facultyRepository);
+        Mockito.reset(facultyRepository); //Сброс для verify, потому что в тест-методе есть другая логика:
 
         // not found checking
         //initial data:
-        when(facultyRepository.findById(eq(2L))).thenReturn(Optional.empty());
+        when(facultyRepository.findById(eq(2L))).thenReturn(Optional.ofNullable(null)); //Имитация на ненахождение такого факультета
         //test:
         mockMvc.perform(
-                        MockMvcRequestBuilders.delete("/facult/2"))  //Специально испортил эндпоинт, чтобы выдало 404, т.к. у меня запрограммирована ошибка 405
+                        MockMvcRequestBuilders.delete("/faculty/2"))  //У меня запрограммирован 405 (MethodNotAllowed), поэтому, сверяю, что будет возвращён именно этот статус
                 //check:
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.status().isMethodNotAllowed())
                 .andExpect(result -> {
                     String responseString = result.getResponse().getContentAsString();
                     assertThat(responseString).isNotNull();
@@ -262,7 +265,7 @@ public class FacultyControllerWebMvcTest {
         when(facultyRepository.findById(id)).thenReturn(Optional.of(faculty));
         faculty.setName("mmmmmm");
 
-        JSONObject updateFacultyRq = new JSONObject();
+        JSONObject updateFacultyRq = new JSONObject(); //Подготовка к передачи тела в запросе в виде JSON
         updateFacultyRq.put("id", faculty.getId());
         updateFacultyRq.put("name", faculty.getName());
         updateFacultyRq.put("color", faculty.getColor());
@@ -272,8 +275,8 @@ public class FacultyControllerWebMvcTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .put("/faculty/")
                         .content(updateFacultyRq.toString())  //Передача тела объекта updateFacultyRq в контроллер в виде строки по заданному URL
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON) //тип JSON-запроса
+                        .accept(MediaType.APPLICATION_JSON)) //тип JSON-ответа
                 //check:
                 .andExpect(status().isOk())  //Если тест проходит, то статус 200
                 .andExpect(jsonPath("$.id").value(id))
@@ -302,11 +305,12 @@ public class FacultyControllerWebMvcTest {
         //test:
         mockMvc.perform(
                         MockMvcRequestBuilders.put("/faculty")
-                                .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(faculty)))  //Отправляем через мокURL-шаблон в контроллер, откорректированное в JSON
+                                .contentType(MediaType.APPLICATION_JSON) //тип JSON-запроса
+                                .content(mapper.writeValueAsString(faculty)))  //Отправляем через мокURL-шаблон в контроллер, откорректированное в JSON (самосериализация)
                 //check:
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(result -> {
+                    //десериализация:
                     Faculty facultyResult = mapper.readValue(
                             result.getResponse().getContentAsString(),
                             Faculty.class //Получаем результатом в контроллере (через мокURL-шаблон) факультет, отсериализованный из JSON
@@ -324,10 +328,11 @@ public class FacultyControllerWebMvcTest {
         mockMvc.perform(
                         MockMvcRequestBuilders.put("/faculty")
                                 .contentType(MediaType.APPLICATION_JSON)
-                                .content(mapper.writeValueAsString(faculty2)))  //Отправляем факультет с id=2 для обеспечения работы заглушки
+                                .content(mapper.writeValueAsString(faculty2)))  //Отправляем факультет с id=2 для обеспечения работы заглушки (сериализация)
                 //check:
                 .andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(result -> {
+                    //десериализация:
                     String responseString = result.getResponse().getContentAsString();
                     assertThat(responseString).isNotNull();
                 });
@@ -340,7 +345,7 @@ public class FacultyControllerWebMvcTest {
         when(facultyRepository.findByColorIgnoreCase(anyString())).thenReturn(faculty2);
         //test:
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/faculty/by-color?color=blau")
+                        .get("/faculty/by-color?color=BLAU")
                         .accept(MediaType.APPLICATION_JSON))
                 //check:
                 .andExpect(status().isOk())

@@ -78,7 +78,7 @@ public class FacultyController {
             return ResponseEntity.status(405).build();
         }
         /**
-         * При удалении студента по выбранному Id по умолчанию пропишется 404.
+         * При удалении студента по выбранному Id по умолчанию пропишется 200.
          */
         return ResponseEntity.ok(faculty);
     }

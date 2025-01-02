@@ -52,8 +52,7 @@ public class StudentAvatarService {
         logger.info("Старт метода uploadAvatar");
         Student student = studentService.findStudent(id); // Находим объект студента по id.
 
-        Path filePath = Path.of(avatarsDir, id + "." + getExtension(file.getOriginalFilename()));  // Путь к файлу сохраняем в переменной filePath
-        System.out.println("id1 = " + id);
+        Path filePath = Path.of(avatarsDir, id + "." + getExtension(file.getOriginalFilename()));  // Путь к файлу сохраняем в переменной filePath в папке avatar        System.out.println("id1 = " + id);
         Files.createDirectories(filePath.getParent()); // Создаем директорию для хранения файла
         Files.deleteIfExists(filePath);  // Удаляем из созданной папки предыдущий файл, если он там был
         try (InputStream is = file.getInputStream(); // Открываем входной поток для приёма файла file
