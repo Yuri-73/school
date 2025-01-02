@@ -11,7 +11,7 @@ import javax.annotation.PostConstruct;
 
 @Service
 @Profile("test")
-@Primary
+@Primary //Или эта аннотация или бин этого класса в AppConfig. Совсем без того и другого не компилируется! Вместе оба - тоже хорошо. (?)
 public class GetPortServiceTest implements GetPortService {
     @Value("${server.port}")
     private String serverPort;

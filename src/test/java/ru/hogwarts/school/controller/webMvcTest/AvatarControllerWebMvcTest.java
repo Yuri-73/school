@@ -77,10 +77,11 @@ public class AvatarControllerWebMvcTest {
     @Test
     void uploadAvatarTest() throws Exception {
         //входные условия:
-        Student student = new Student(388L, "Nikolay", 30);
-        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg"));
+        Student student = new Student(388L, "Nikolay", 30);  //id выбрано случайно
+        byte[] bytes = Files.readAllBytes(Path.of("src/test/resources/test.jpg")); //Тестовая картинка, которую будем укладывать при тестировании в папку avatars
         Avatar avatar = new Avatar();
-//        avatar.setData(bytes); //Эти и последующие назначения следует удалить, т.к. avatar их получает внутри рабочего метода uploadAvatar() класса StudentAvatarService
+//        avatar.setData(bytes); //Эти и последующие 4 назначения следует удалить,
+//        т.к. avatar их всё-равно получает внутри рабочего метода uploadAvatar() класса StudentAvatarService
 //        avatar.setFilePath("/1L.pdf");
 //        avatar.setFileSize(45L);
 //        avatar.setStudent(student);
@@ -93,16 +94,17 @@ public class AvatarControllerWebMvcTest {
         File file = new File("src/test/resources/test.jpg");
         String name = file.getName();
 
+        //Формируем тестовый объект для картинки:
         MockMultipartFile mockMultipartFile = new MockMultipartFile("avat", name, MediaType.MULTIPART_FORM_DATA_VALUE, bytes);
 
         //тест: делаем запрос на укладку картинки по id студента (в БД она не попадает - там заглушка, поэтому в Сваггере по id=388 картинку не получить) и телу запроса - mockMultipartFile
         MvcResult mvcResult = mockMvc.perform(multipart("/" + student.getId() + "/avatar")
                         .file(mockMultipartFile))
-                .andDo(MockMvcResultHandlers.print()) //Распечатываем в логах теста контент запроса и вывода
+                .andDo(MockMvcResultHandlers.print()) //Распечатываем в логах теста контент запроса и вывода ответа
                 .andExpect(status().isOk())
                 .andReturn();
 
-        //Почему-то не распечатывается. Может, из-за того, что uploadAvatar ничего не выдаёт из себя.
+        //Почему-то не распечатывается. Может быть, из-за того, что uploadAvatar ничего не выдаёт из себя.
         String jsonResponse = mvcResult.getResponse().getContentAsString();
         System.out.println("!!!");
         System.out.println("jsonResponse: " + jsonResponse);
@@ -197,7 +199,7 @@ public class AvatarControllerWebMvcTest {
         //Формирование объекта page:
         Pageable pageable = PageRequest.of(pageNumber - 1, pageSize);
         List<Avatar> list = List.of(avatar, avatar2);
-        Page<Avatar> avatarPage = new PageImpl<>(list, pageable, 0);
+        Page<Avatar> avatarPage = new PageImpl<>(list, pageable, 0);  //total может быть любым (siq!)
 
         when(studentAvatarRepository.findAll(pageable)).thenReturn(avatarPage);
 
@@ -206,11 +208,11 @@ public class AvatarControllerWebMvcTest {
                         .get("/page-avatars/")
                         .param("page", "" + pageNumber)
                         .param("size", "" + pageSize)
-                        .accept(MediaType.APPLICATION_JSON))
+                        .accept(MediaType.APPLICATION_JSON))  //Возвращаем тип контента-JSON
                 //Контроль:
                 .andExpectAll()
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$").isArray())  //Превращаем JSON-коллекцию аватарок в JSON-массив
                 .andExpect(jsonPath("$.size()").value(2))
                 .andExpect(jsonPath("$[0].fileSize").value(11l))
                 .andExpect(jsonPath("$[1].fileSize").value(12l))
@@ -239,7 +241,7 @@ public class AvatarControllerWebMvcTest {
                 .andExpectAll()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$.size()").value(0))
+                .andExpect(jsonPath("$.size()").value(0))  //убеждаемся, что получаем пустой Лист
                 .andReturn();
     }
 }

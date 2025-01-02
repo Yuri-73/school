@@ -118,7 +118,11 @@ public class FacultyController {
      * ДЗ-3.4 Введение в SQL шаг 1.2(2) (нахождение фака по его имени через стандартный метод репозитория)
      */
     public ResponseEntity<Faculty> findByName(@RequestParam String name) {
-        return ResponseEntity.ok(facultyService.findByName(name));
+        Faculty faculty = facultyService.findByName(name);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faculty);
     }
 
 
@@ -128,7 +132,11 @@ public class FacultyController {
      */
     public ResponseEntity<Faculty> findByNameAndColor(@RequestParam String name,
                                                       @RequestParam String color) {
-        return ResponseEntity.ok(facultyService.findByNameAndColor(name, color));
+        Faculty faculty = facultyService.findByNameAndColor(name, color);
+        if (faculty == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faculty);
     }
 
 
@@ -137,7 +145,8 @@ public class FacultyController {
      *  ДЗ-3.4 шаг 4.2 SQL (нахождение студентов по идентификатору факультета через метод репозитория по умолчанию)
      */
     public ResponseEntity<Collection<Student>> getStudentsOfFaculty(@PathVariable Long id) {
-        return ResponseEntity.ok(facultyService.getStudentsOfFaculty(id));
+        Collection<Student> students = facultyService.getStudentsOfFaculty(id);
+        return ResponseEntity.ok(students);
     }
 
     @GetMapping("/long-name")

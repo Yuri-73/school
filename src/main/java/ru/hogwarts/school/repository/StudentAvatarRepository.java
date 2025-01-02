@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface StudentAvatarRepository extends JpaRepository<Avatar, Long> {
     Optional<Avatar> findByStudentId(Long id);
 
-    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок:
+    // Пагинация шаг 2 ДЗ-4.1 всего 1 метод: постраничный вывод аватарок. Если его удалить-всё-равно работает пагинация!!!
     List<Avatar> findAll();
 }
